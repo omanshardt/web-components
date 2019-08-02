@@ -1,3 +1,8 @@
+/**
+ * uic-clock 1.0
+ * Release date: 2019-08-02
+ */
+
 class uicClock extends HTMLElement {
     static get observedAttributes() {
         return ['digital'];
