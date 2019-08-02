@@ -37,17 +37,15 @@ class uicClock extends HTMLElement {
     }
 
     get stopTime() {
-        return this.stopTime;
+        return this._stopTime;
     }
 
     stopTime(stop) {
-        this.stopTime = true;
-        console.log(this.stopTime);
+        this._stopTime = true;
         window.cancelAnimationFrame(this.animationId);
     }
     startTime(start) {
-        this.stopTime = false;
-        console.log(this.stopTime);
+        this._stopTime = false;
         this.doClock(this);
     }
 
