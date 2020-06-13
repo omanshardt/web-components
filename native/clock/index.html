@@ -4,6 +4,94 @@
     <meta charset="utf-8" />
     <title>Clock</title>
     <script src="components/uic-clock.js"></script>
+    <style>
+      .test {
+        font-family:'verdana';
+        font-weight:bold;
+        letter-spacing:0em;
+    
+      }
+      .test > span {
+        -border:1px solid red;
+        display:inline-block;
+        width:8ch;
+      } 
+  
+      .test > span > span {
+        -border:1px solid blue;
+        white-space:nowrap
+      }
+        .test > span > span > i{
+          box-sizing:border-box;
+          border:1px solid #ffffff66;
+          font-style:normal;
+          width:1.1ch;
+          margin:0 0.1ch;
+          display:inline-block;
+          text-align:center;
+          -line-height:0;
+          background: linear-gradient(0deg, rgba(20,20,20,1) 0%, rgba(43,43,43,1) 30%, rgba(64,64,64,1) 50%, rgba(43,43,43,1) 70%, rgba(20,20,20,1) 100%);
+          box-shadow: inset 0px 0px 10px #000;
+      }
+  
+          .test > span > span > i.colon {
+            width:0.8ch;
+            -vertical-align:0.06em
+        }
+    
+      .test2 {
+        font-family:'verdana';
+        font-weight:bold;
+        letter-spacing:0em;
+    
+      }
+      .test2 > span {
+        -border:1px solid red;
+        display:inline-block;
+        width:12ch;
+      } 
+  
+      .test2 > span > span {
+        position:relative;
+        box-sizing:border-box;
+        border:1px solid #ffffff66;
+        white-space:nowrap;
+        width:1.1ch;
+        margin:0 0.1ch;
+        display:inline-block;
+        text-align:center;
+        background:rgb(20,20,20);
+        box-shadow: inset 0px 0px 10px #000;
+      }
+        .test2 > span > span::after {
+          position:absolute;
+          content:'';
+          left:0;
+          right:0;
+          top:0;
+          bottom:0;
+          -background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.17) 30%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.17) 70%, rgba(255,255,255,0) 100%);
+          background: linear-gradient(0deg, rgba(20,20,20,0.7) 0%, rgba(20,20,20,0.15) 30%, rgba(20,20,20,0.05) 50%, rgba(20,20,20,0.15) 70%, rgba(20,20,20,0.7) 100%);
+        }
+    
+        .test > span > span > i{
+          box-sizing:border-box;
+          border:1px solid #ffffff66;
+          font-style:normal;
+          width:1.1ch;
+          margin:0 0.1ch;
+          display:inline-block;
+          text-align:center;
+          -line-height:0;
+          background: linear-gradient(0deg, rgba(20,20,20,1) 0%, rgba(43,43,43,1) 30%, rgba(64,64,64,1) 50%, rgba(43,43,43,1) 70%, rgba(20,20,20,1) 100%);
+          box-shadow: inset 0px 0px 10px #000;
+      }
+  
+          .test2 > span > span.colon {
+            width:0.8ch;
+            -vertical-align:0.06em
+        }
+    </style>
 </head>
 <body style="background:#000">
     <div style="
@@ -44,8 +132,23 @@
     <uic-clock digital style="font-size:5vw; font-family:courier; font-weight:bold; color:#eec"></uic-clock>
 
     <hr>
-    
+
     <p style="color:#ddd; font-family:arial; line-height:1.8;">In this example the <uic-clock digital></uic-clock> is included within a normal text. We also can use a <uic-clock></uic-clock> without digital display. The <uic-clock style="background-color:#eec; color:#000; padding:3px 4px; border-radius:4px;"></uic-clock> can be styled individually. This also applies for the version with digital display liker this <uic-clock digital style="background-color:#eec; color:#000; padding:3px 4px; border-radius:4px;"></uic-clock> shows.</p>
+
+    <hr>
+
+    <h1 style="color:#eee">Some Design Examples</h1>
+
+    <div class="test" style="font-size:120px; color:#fff">
+        <span><span><i>1</i><i>2</i><i class="colon">:</i><i>1</i><i>2</i><i class="colon">:</i><i>1</i><i>2</i></span></span><br>
+        <span><span>12:12:12</span></span><br>
+        <span><span>12:12:11</span></span><br>
+        <span><span>0000000000</span></span><br>
+    </div>
+
+    <div class="test2" style="font-size:120px; color:#fff">
+        <span><span><span>1</span></span><span><span>2</span></span><span class="colon"><span>:</span></span><span><span>2</span></span><span><span>4</span></span><span class="colon"><span>:</span></span><span><span>1</span></span><span><span>8</span></span></span>
+    </div<
 
 </body>
 <script>
