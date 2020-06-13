@@ -1,6 +1,6 @@
 /**
- * uic-clock 1.0
- * Release date: 2019-08-02
+ * uic-clock 1.1
+ * Release date: 2020-06-13
  */
 
 class uicClock extends HTMLElement {
