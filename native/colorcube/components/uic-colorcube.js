@@ -1,4 +1,5 @@
 const template = document.createElement('template');
+// language=HTML
 template.innerHTML = `
 <style>
     .cubeWrapper {
@@ -176,9 +177,52 @@ customElements.define('uic-colorcube', class extends HTMLElement {
 
     attributeChangedCallback(attributeName, oldValue, newValue) {
         console.log('attributeChangedCallback');
+        console.log(this)
+        if (attributeName === 'rotatable') {
+            if (this.hasAttribute('rotatable')) {
+                console.log('rotate');
+                this.shadowRoot.querySelector('.cubeWrapper').addEventListener('mousedown', this.startRotating, {passive: false});
+            }
+            else {
+               console.log('do not rotate');
+                this.shadowRoot.querySelector('.cubeWrapper').removeEventListener('mousedown', this.startRotating, {passive: false});
+            }
+        }
+    }
+
+    startRotating = (e) => {
+        console.log('start');
+        // adding events for rotating
+        document.addEventListener('mousemove', this.rotate, {passive: false});
+        document.addEventListener('mouseup', this.stopRotating, {passive: false});
+    }
+
+    rotate = (e) => {
+        console.log(e, 'rotate');
+    }
+
+    stopRotating = (e) => {
+        console.log('stop');
+        // removing events for rotating
+        document.removeEventListener('mousemove', this.rotate, {passive: false});
+        document.removeEventListener('mouseup', this.stopRotating, {passive: false});
     }
 
     static get observedAttributes() {
         return ['rotatable'];
+    }
+
+    get rotatable() {
+        let b = this.hasAttribute('rotatable');
+        return b;
+    }
+
+    set rotatable(isRotatable) {
+        if (isRotatable === true) {
+            this.setAttribute('rotatable', '');
+        }
+        else if (isRotatable === false) {
+            this.removeAttribute('rotatable');
+        }
     }
 });
