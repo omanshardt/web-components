@@ -73,7 +73,9 @@ template.innerHTML = `
         justify-content: center;
         align-items: center;
         background-blend-mode: screen;
-        border:8px solid #fff;
+        border-width:8px;
+        border-style:solid;
+        border-color:#fff;
         opacity:1;
     }
 
@@ -149,18 +151,15 @@ template.innerHTML = `
 customElements.define('uic-colorcube', class extends HTMLElement {
     constructor() {
         super();
-        console.log('constructor');
         this.attachShadow({ mode: 'open' });
         this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
     connectedCallback() {
-        console.log('connectedCallback');
         const resizeObserver = new ResizeObserver(entries => {
-            console.log('resize');
             for (const entry of entries) {
                 let s = Math.min(entry.contentRect.width, entry.contentRect.height)
-                let z = s/256 * 0.45;
+                let z = s/256 * 0.55;
                 this.shadowRoot.querySelector('.zoomWrapper').style.transform = `scale(${z}, ${z}) perspective(1280px)`;
             }
         });
@@ -172,7 +171,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         if (this.hasAttribute('rotation-y')) {
             this.rotationY = this.getAttribute('rotation-y');
         }
-        console.log(this.rotationY)
+        if (this.hasAttribute('border-width')) {
+            this.borderWidth = this.getAttribute('border-width');
+        }
+        if (this.hasAttribute('opacity')) {
+            this.opacity = this.getAttribute('opacity');
+        }
     }
 
     disconnectedCallback() {
@@ -184,8 +188,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     }
 
     attributeChangedCallback(attributeName, oldValue, newValue) {
-        console.log('attributeChangedCallback', attributeName, newValue);
-        console.log(this)
         if (attributeName === 'rotatable') {
             if (this.hasAttribute('rotatable')) {
                 this.shadowRoot.querySelector('.cubeWrapper').addEventListener('mousedown', this.startRotating, {passive: false});
@@ -208,10 +210,26 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
             catch(e) {}
         }
+        else if (attributeName === 'border-width') {
+            try {
+                this.getStyleSheetRule('.surface').style.setProperty('border-width', `${newValue}px`);
+            }
+            catch(e) {}
+        }
+        else if (attributeName === 'opacity') {
+            try {
+                if (newValue < 0 || newValue > 1) {
+                    throw(new RangeError());
+                }
+                newValue = 0.5 + newValue / 2;
+                this.getStyleSheetRule('.surface').style.setProperty('opacity', `${newValue}`);
+            }
+            catch(e) {}
+        }
     }
 
     static get observedAttributes() {
-        return ['rotatable', 'rotation-x', 'rotation-y'];
+        return ['rotatable', 'rotation-x', 'rotation-y', 'border-width', 'opacity'];
     }
 
 
@@ -277,6 +295,49 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     }
 
     /**
+     * @param val
+     */
+    set borderWidth(val) {
+        this.setAttribute('border-width', val);
+        try {
+            this.getStyleSheetRule('.surface').style.setProperty('border-width', `${val}px`);
+        }
+        catch(e) {}
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    get borderWidth() {
+        return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
+    }
+
+    /**
+     * @param val
+     */
+    set opacity(val) {
+        // val = Math.max(0, Math.min(1, val));
+        this.setAttribute('opacity', val);
+        try {
+            if (val < 0 || val > 1) {
+                throw(new RangeError());
+            }
+            val = 0.5 + val / 2;
+            this.getStyleSheetRule('.surface').style.setProperty('opacity', `${val}`);
+        }
+        catch(e) {}
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    get opacity() {
+        return (parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('opacity')) - 0.5) * 2;
+    }
+
+    /**
      * This sets the given value for the rotationY-property within the stylesheets cssRule.
      * As there is no CSSStyleSheet before connecting the component to the document, this operation will fail on initially set attribute values (html-attribute 'rotation-y').
      * So we catch the error and do nothing in this place. Instead we grab that value from the attribute within the 'connectedCallback'-method and set the rotationY value,
@@ -320,7 +381,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @param e
      */
     startRotating = (e) => {
-        console.log('start', this.shadowRoot.querySelector('.cube'));
         e.stopPropagation();
         let pointerEventX = e.clientX || e.changedTouches[0].clientX;
         let pointerEventY = e.clientY || e.changedTouches[0].clientY;
@@ -369,8 +429,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
 
         this.rotationX = degX;
         this.rotationY = degY;
-
-        console.log(deltaX, deltaY, degX, degY);
     };
 
     /**
@@ -380,7 +438,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @param stopRotatingHandler
      */
     stopRotating = (e, rotateHandler, stopRotatingHandler) => {
-        console.log('stop');
         e.stopPropagation();
         // removing events for rotating
         document.removeEventListener('mousemove', rotateHandler, {passive: false});
