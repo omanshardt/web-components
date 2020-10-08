@@ -195,10 +195,18 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
         }
         else if (attributeName === 'rotation-x') {
-            this.rotationX = newValue;
+            try {
+                let rotation = this.rotation;
+                this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${newValue}deg) rotateY(${rotation[1]}deg) rotateZ(${rotation[2]}deg)`);
+            }
+            catch(e) {}
         }
         else if (attributeName === 'rotation-y') {
-            this.rotationY = newValue;
+            try {
+                let rotation = this.rotation;
+                this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${rotation[0]}deg) rotateY(${newValue}deg) rotateZ(${rotation[2]}deg)`);
+            }
+            catch(e) {}
         }
     }
 
@@ -247,9 +255,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @param val
      */
     set rotationX(val) {
+        this.setAttribute('rotation-x', val);
         try {
             let rotation = this.rotation;
-            this.setAttribute('rotation-x', val);
             this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${val}deg) rotateY(${rotation[1]}deg) rotateZ(${rotation[2]}deg)`);
         }
         catch(e) {}
@@ -267,9 +275,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @param val
      */
     set rotationY(val) {
+        this.setAttribute('rotation-y', val);
         try {
             let rotation = this.rotation;
-            this.setAttribute('rotation-y', val);
             this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${rotation[0]}deg) rotateY(${val}deg) rotateZ(${rotation[2]}deg)`);
         }
         catch(e) {}
