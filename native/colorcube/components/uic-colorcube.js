@@ -322,9 +322,23 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @param e
      * @param rotionInfos
      */
-    rotate = (e, rotionInfos) => {
-        console.log('rotate', rotionInfos);
+    rotate = (e, rotionInfos, mouseSensivity = 512) => {
         e.stopPropagation();
+
+        var localX = e.clientX || e.changedTouches[0].clientX;
+        var localY = e.clientY || e.changedTouches[0].clientY;
+
+        let deltaX = localX - rotionInfos.x;
+        let deltaY = localY - rotionInfos.y;
+
+        let degX = rotionInfos.rotationX + (- (deltaY / mouseSensivity * 360));
+        let degY = rotionInfos.rotationY + (deltaX / mouseSensivity * 360);
+        // this sets the CSSStyleSheet rule directly, might be a better performance, although this is hard to detect
+        // this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${degX}deg) rotateY(${degY}deg) rotateZ(0deg)`);
+        this.rotationX = degX;
+        this.rotationY = degY;
+
+        console.log(deltaX, deltaY, degX, degY);
     };
 
     /**
