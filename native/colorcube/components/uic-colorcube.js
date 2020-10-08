@@ -177,6 +177,15 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         if (this.hasAttribute('opacity')) {
             this.opacity = this.getAttribute('opacity');
         }
+        if (this.hasAttribute('shrink')) {
+            this.shrink = this.getAttribute('shrink');
+        }
+        if (this.hasAttribute('explode')) {
+            this.explode = this.getAttribute('explode');
+        }
+        if (this.hasAttribute('border-radius')) {
+            this.borderRadius = this.getAttribute('border-radius');
+        }
     }
 
     disconnectedCallback() {
@@ -226,10 +235,42 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
             catch(e) {}
         }
+        else if (attributeName === 'shrink') {
+            try {
+                if (newValue < 0 || newValue > 1) {
+                    throw(new RangeError());
+                }
+                let f = 100 - (newValue * 100 * 0.25);
+                this.getStyleSheetRule('.surface').style.setProperty('width', `${f}%`);
+                this.getStyleSheetRule('.surface').style.setProperty('height', `${f}%`);
+
+                // newValue = 0.75 + newValue * 0.25;
+                // this.getStyleSheetRule('.surface').style.setProperty('zoom', `${newValue}`);
+            }
+            catch(e) {}
+        }
+        else if (attributeName === 'explode') {
+            try {
+                if (newValue < 0 || newValue > 1) {
+                    throw(new RangeError());
+                }
+                // @Todo
+            }
+            catch(e) {}
+        }
+        else if (attributeName === 'border-radius') {
+            if (newValue < 0 || newValue > 50) {
+                throw(new RangeError());
+            }
+            try {
+                this.getStyleSheetRule('.surface').style.setProperty('border-radius', `${newValue}%`);
+            }
+            catch(e) {}
+        }
     }
 
     static get observedAttributes() {
-        return ['rotatable', 'rotation-x', 'rotation-y', 'border-width', 'opacity'];
+        return ['rotatable', 'rotation-x', 'rotation-y', 'border-width', 'opacity', 'shrink', 'explode', 'border-radius'];
     }
 
 
@@ -262,6 +303,8 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         }
     };
 
+
+
     /**
      *
      * @returns {*}
@@ -279,12 +322,8 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      */
     set rotationX(val) {
         this.setAttribute('rotation-x', val);
-        try {
-            let rotation = this.rotation;
-            this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${val}deg) rotateY(${rotation[1]}deg) rotateZ(${rotation[2]}deg)`);
-        }
-        catch(e) {}
     }
+
 
     /**
      *
@@ -295,15 +334,16 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     }
 
     /**
+     * This sets the given value for the rotationY-property within the stylesheets cssRule.
+     * As there is no CSSStyleSheet before connecting the component to the document, this operation will fail on initially set attribute values (html-attribute 'rotation-y').
+     * So we catch the error and do nothing in this place. Instead we grab that value from the attribute within the 'connectedCallback'-method and set the rotationY value,
+     * because at that time the CSSStyleSheet has been created and we can access it.
      * @param val
      */
-    set borderWidth(val) {
-        this.setAttribute('border-width', val);
-        try {
-            this.getStyleSheetRule('.surface').style.setProperty('border-width', `${val}px`);
-        }
-        catch(e) {}
+    set rotationY(val) {
+        this.setAttribute('rotation-y', val);
     }
+
 
     /**
      *
@@ -316,18 +356,10 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     /**
      * @param val
      */
-    set opacity(val) {
-        // val = Math.max(0, Math.min(1, val));
-        this.setAttribute('opacity', val);
-        try {
-            if (val < 0 || val > 1) {
-                throw(new RangeError());
-            }
-            val = 0.5 + val / 2;
-            this.getStyleSheetRule('.surface').style.setProperty('opacity', `${val}`);
-        }
-        catch(e) {}
+    set borderWidth(val) {
+        this.setAttribute('border-width', val);
     }
+
 
     /**
      *
@@ -338,20 +370,74 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     }
 
     /**
-     * This sets the given value for the rotationY-property within the stylesheets cssRule.
-     * As there is no CSSStyleSheet before connecting the component to the document, this operation will fail on initially set attribute values (html-attribute 'rotation-y').
-     * So we catch the error and do nothing in this place. Instead we grab that value from the attribute within the 'connectedCallback'-method and set the rotationY value,
-     * because at that time the CSSStyleSheet has been created and we can access it.
      * @param val
      */
-    set rotationY(val) {
-        this.setAttribute('rotation-y', val);
-        try {
-            let rotation = this.rotation;
-            this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${rotation[0]}deg) rotateY(${val}deg) rotateZ(${rotation[2]}deg)`);
+    set opacity(val) {
+        if (val < 0 || val > 1) {
+            throw(new RangeError());
         }
-        catch(e) {}
+        this.setAttribute('opacity', val);
     }
+
+
+    /**
+     *
+     * @returns {*}
+     */
+    get shrink() {
+        let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('width'));
+        let val = (f + 100) / 1000 / 0.25; // @Todo: correct calculation
+        return val;
+    }
+
+    /**
+     * @param val
+     */
+    set shrink(val) {
+        if (val < 0 || val > 1) {
+            throw(new RangeError());
+        }
+        this.setAttribute('shrink', val);
+    }
+
+
+    /**
+     *
+     * @returns {*}
+     */
+    get explode() {
+        return ''; // @Todo
+    }
+
+    /**
+     * @param val
+     */
+    set explode(val) {
+        if (val < 0 || val > 1) {
+            throw(new RangeError());
+        }
+        this.setAttribute('explode', val);
+    }
+
+
+    /**
+     *
+     * @returns {*}
+     */
+    get borderRadius() {
+        return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
+    }
+
+    /**
+     * @param val
+     */
+    set borderRadius(val) {
+        if (val < 0 || val > 50) {
+            throw(new RangeError());
+        }
+        this.setAttribute('border-radius', val);
+    }
+
 
     /**
      * This indicates if the cube is rotatable by mouse / touch events or not
