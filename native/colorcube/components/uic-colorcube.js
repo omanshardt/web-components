@@ -214,6 +214,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         return ['rotatable', 'rotation-x', 'rotation-y'];
     }
 
+
     /**
      * Gets the rotation as is specified within the css rule of the stylesheet
      * @returns {*[]}
@@ -243,6 +244,10 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         }
     };
 
+    /**
+     *
+     * @returns {*}
+     */
     get rotationX() {
         return this.rotation[0];
     }
@@ -263,6 +268,10 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         catch(e) {}
     }
 
+    /**
+     *
+     * @returns {*}
+     */
     get rotationY() {
         return this.rotation[1];
     }
@@ -281,6 +290,28 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${rotation[0]}deg) rotateY(${val}deg) rotateZ(${rotation[2]}deg)`);
         }
         catch(e) {}
+    }
+
+    /**
+     * This indicates if the cube is rotatable by mouse / touch events or not
+     * @returns {boolean}
+     */
+    get rotatable() {
+        let b = this.hasAttribute('rotatable');
+        return b;
+    }
+
+    /**
+     * This defines if the cube is rotatable or not
+     * @param isRotatable
+     */
+    set rotatable(isRotatable) {
+        if (isRotatable === true) {
+            this.setAttribute('rotatable', '');
+        }
+        else if (isRotatable === false) {
+            this.removeAttribute('rotatable');
+        }
     }
 
 
@@ -335,6 +366,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         let degY = rotionInfos.rotationY + (deltaX / mouseSensivity * 360);
         // this sets the CSSStyleSheet rule directly, might be a better performance, although this is hard to detect
         // this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${degX}deg) rotateY(${degY}deg) rotateZ(0deg)`);
+
         this.rotationX = degX;
         this.rotationY = degY;
 
@@ -355,27 +387,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         document.removeEventListener('mouseup', stopRotatingHandler, {passive: false});
     };
 
-    /**
-     * This indicates if the cube is rotatable by mouse / touch events or not
-     * @returns {boolean}
-     */
-    get rotatable() {
-        let b = this.hasAttribute('rotatable');
-        return b;
-    }
-
-    /**
-     * This defines if the cube is rotatable or not
-     * @param isRotatable
-     */
-    set rotatable(isRotatable) {
-        if (isRotatable === true) {
-            this.setAttribute('rotatable', '');
-        }
-        else if (isRotatable === false) {
-            this.removeAttribute('rotatable');
-        }
-    }
 
     getStyleSheetRule(selectorText, styleSheetSelector = '#css-colorcube') {
         var cssStyleSheet = this.shadowRoot.querySelector(styleSheetSelector).sheet;
