@@ -1,7 +1,7 @@
 const template = document.createElement('template');
 // language=HTML
 template.innerHTML = `
-<style>
+<style id="css-colorcube">
     .cubeWrapper {
         --red-min: 0;
         --red-max: 255;
@@ -59,7 +59,7 @@ template.innerHTML = `
         justify-content: center;
         align-items: center;
         transform-style: preserve-3d;
-        transform: rotateX(-35deg) rotateY(35deg) rotateZ(0deg);
+        transform: rotateX(-15deg) rotateY(35deg) rotateZ(0deg);
 
         /*border:1px solid blue;*/
     }
@@ -165,6 +165,14 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
         });
         resizeObserver.observe(this.shadowRoot.querySelector('.cubeWrapper'));
+        // this initially transfers the attribute values ('rotation-x' and 'rotation-y') to the corresponding CSSRule
+        if (this.hasAttribute('rotation-x')) {
+            this.rotationX = this.getAttribute('rotation-x');
+        }
+        if (this.hasAttribute('rotation-y')) {
+            this.rotationY = this.getAttribute('rotation-y');
+        }
+        console.log(this.rotationY)
     }
 
     disconnectedCallback() {
@@ -176,47 +184,168 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     }
 
     attributeChangedCallback(attributeName, oldValue, newValue) {
-        console.log('attributeChangedCallback');
+        console.log('attributeChangedCallback', attributeName, newValue);
         console.log(this)
         if (attributeName === 'rotatable') {
             if (this.hasAttribute('rotatable')) {
-                console.log('rotate');
                 this.shadowRoot.querySelector('.cubeWrapper').addEventListener('mousedown', this.startRotating, {passive: false});
             }
             else {
-               console.log('do not rotate');
                 this.shadowRoot.querySelector('.cubeWrapper').removeEventListener('mousedown', this.startRotating, {passive: false});
             }
         }
-    }
-
-    startRotating = (e) => {
-        console.log('start');
-        // adding events for rotating
-        document.addEventListener('mousemove', this.rotate, {passive: false});
-        document.addEventListener('mouseup', this.stopRotating, {passive: false});
-    }
-
-    rotate = (e) => {
-        console.log(e, 'rotate');
-    }
-
-    stopRotating = (e) => {
-        console.log('stop');
-        // removing events for rotating
-        document.removeEventListener('mousemove', this.rotate, {passive: false});
-        document.removeEventListener('mouseup', this.stopRotating, {passive: false});
+        else if (attributeName === 'rotation-x') {
+            this.rotationX = newValue;
+        }
+        else if (attributeName === 'rotation-y') {
+            this.rotationY = newValue;
+        }
     }
 
     static get observedAttributes() {
-        return ['rotatable'];
+        return ['rotatable', 'rotation-x', 'rotation-y'];
     }
 
+    /**
+     * Gets the rotation as is specified within the css rule of the stylesheet
+     * @returns {*[]}
+     */
+    get rotation() {
+        let cubeTransform = this.getStyleSheetRule('.cube').style.getPropertyValue('transform');
+        if (cubeTransform != '') {
+            const regex = /rotateX\((.*?)deg\).*?rotateY\((.*?)deg\).*?rotateZ\((.*?)deg\)/gm;
+            let res = [];
+            let m;
+            while ((m = regex.exec(cubeTransform)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (m.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                // The result can be accessed through the `m`-variable.
+                m.forEach((match, groupIndex) => {
+                    res.push(match);
+                });
+            }
+            let rotation = [parseFloat(res[1]) || 0, parseFloat(res[2]) || 0, parseFloat(res[3]) || 0];
+            return rotation;
+        }
+        else {
+            return [null, null, null];
+        }
+    };
+
+    get rotationX() {
+        return this.rotation[0];
+    }
+
+    /**
+     * This sets the given value for the rotationX-property within the stylesheets cssRule.
+     * As there is no CSSStyleSheet before connecting the component to the document, this operation will fail on initially set attribute values (html-attribute 'rotation-x').
+     * So we catch the error and do nothing in this place. Instead we grab that value from the attribute within the 'connectedCallback'-method and set the rotationX value,
+     * because at that time the CSSStyleSheet has been created and we can access it.
+     * @param val
+     */
+    set rotationX(val) {
+        try {
+            let rotation = this.rotation;
+            this.setAttribute('rotation-x', val);
+            this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${val}deg) rotateY(${rotation[1]}deg) rotateZ(${rotation[2]}deg)`);
+        }
+        catch(e) {}
+    }
+
+    get rotationY() {
+        return this.rotation[1];
+    }
+
+    /**
+     * This sets the given value for the rotationY-property within the stylesheets cssRule.
+     * As there is no CSSStyleSheet before connecting the component to the document, this operation will fail on initially set attribute values (html-attribute 'rotation-y').
+     * So we catch the error and do nothing in this place. Instead we grab that value from the attribute within the 'connectedCallback'-method and set the rotationY value,
+     * because at that time the CSSStyleSheet has been created and we can access it.
+     * @param val
+     */
+    set rotationY(val) {
+        try {
+            let rotation = this.rotation;
+            this.setAttribute('rotation-y', val);
+            this.getStyleSheetRule('.cube').style.setProperty('transform', `rotateX(${rotation[0]}deg) rotateY(${val}deg) rotateZ(${rotation[2]}deg)`);
+        }
+        catch(e) {}
+    }
+
+
+    /**
+     * This initializes the rotating capabilities of the cube and sets the starting values
+     * @param e
+     */
+    startRotating = (e) => {
+        console.log('start', this.shadowRoot.querySelector('.cube'));
+        e.stopPropagation();
+        let pointerEventX = e.clientX || e.changedTouches[0].clientX;
+        let pointerEventY = e.clientY || e.changedTouches[0].clientY;
+        // This returns a matrix and therefor is currently not needed
+        // window.getComputedStyle(this.shadowRoot.querySelector('.cube')).transform;
+        let cubeTransform = this.getStyleSheetRule('.cube').style.getPropertyValue('transform');
+        let rotation = this.rotation;
+        // using named functions so we have a reference for removing the eventHandler
+        let _rotate = (e) => {
+            this.rotate(e, {
+                x: pointerEventX,
+                y: pointerEventY,
+                rotationX: rotation[0],
+                rotationY: rotation[1],
+            });
+        };
+        // passing the references to the eventHandlers to the handler that removes these event handlers
+        let _stopRotating = (e) => {
+            this.stopRotating(e, _rotate, _stopRotating);
+        };
+
+        // adding events for rotating
+        document.addEventListener('mousemove', _rotate, {passive: false});
+        document.addEventListener('mouseup', _stopRotating, {passive: false});
+    };
+
+    /**
+     * This tracks mouse / touch events and calculates the movements compared to the start of the rotating action.
+     * The start values were passed directly to this function and not stored as properties of this custom element.
+     * @param e
+     * @param rotionInfos
+     */
+    rotate = (e, rotionInfos) => {
+        console.log('rotate', rotionInfos);
+        e.stopPropagation();
+    };
+
+    /**
+     * This stops rotating by removing the event handlers for rotating and stopping rotating.
+     * @param e
+     * @param rotateHandler
+     * @param stopRotatingHandler
+     */
+    stopRotating = (e, rotateHandler, stopRotatingHandler) => {
+        console.log('stop');
+        e.stopPropagation();
+        // removing events for rotating
+        document.removeEventListener('mousemove', rotateHandler, {passive: false});
+        document.removeEventListener('mouseup', stopRotatingHandler, {passive: false});
+    };
+
+    /**
+     * This indicates if the cube is rotatable by mouse / touch events or not
+     * @returns {boolean}
+     */
     get rotatable() {
         let b = this.hasAttribute('rotatable');
         return b;
     }
 
+    /**
+     * This defines if the cube is rotatable or not
+     * @param isRotatable
+     */
     set rotatable(isRotatable) {
         if (isRotatable === true) {
             this.setAttribute('rotatable', '');
@@ -224,5 +353,19 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         else if (isRotatable === false) {
             this.removeAttribute('rotatable');
         }
+    }
+
+    getStyleSheetRule(selectorText, styleSheetSelector = '#css-colorcube') {
+        var cssStyleSheet = this.shadowRoot.querySelector(styleSheetSelector).sheet;
+        if (cssStyleSheet instanceof CSSStyleSheet) {
+            var cssRuleList = cssStyleSheet.cssRules;
+            for (var i in cssRuleList) {
+                var rule = cssRuleList[i];
+                if (rule.selectorText === selectorText) {
+                    return rule;
+                }
+            }
+        }
+        return null;
     }
 });
