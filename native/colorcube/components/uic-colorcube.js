@@ -9,6 +9,7 @@ template.innerHTML = `
         --green-max: 255;
         --blue-min: 0;
         --blue-max: 255;
+        --transform-local-z: 128px;
         box-sizing:border-box;
         height:100%;
         width:100%;
@@ -80,42 +81,42 @@ template.innerHTML = `
     }
 
     .surface.left {
-        transform: rotateX(0deg) rotateY(-90deg) translateZ(128px);
+        transform: rotateX(0deg) rotateY(-90deg) translateZ(var(--transform-local-z));
         background:
             linear-gradient(0deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-max),var(--green-min),var(--blue-min),1) 100%),
             linear-gradient(90deg, rgba(var(--red-min),var(--green-min),var(--blue-max),1) 0%, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 100%);
     }
 
     .surface.front {
-        transform: rotateX(0deg) rotateY(0deg) translateZ(128px);
+        transform: rotateX(0deg) rotateY(0deg) translateZ(var(--transform-local-z));
         background:
             linear-gradient(0deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-max),var(--green-min),var(--blue-min),1) 100%),
             linear-gradient(90deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-min),var(--green-max),var(--blue-min),1) 100%);
     }
 
     .surface.right {
-        transform: rotateX(0deg) rotateY(90deg) translateZ(128px);
+        transform: rotateX(0deg) rotateY(90deg) translateZ(var(--transform-local-z));
         background:
             linear-gradient(0deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-max),var(--green-min),var(--blue-min),1) 100%),
             linear-gradient(90deg, rgba(var(--red-min),var(--green-max),var(--blue-min),1) 0%, rgba(var(--red-min),var(--green-max),var(--blue-max),1) 100%);
     }
 
     .surface.back {
-        transform: rotateX(0deg) rotateY(180deg) translateZ(128px);
+        transform: rotateX(0deg) rotateY(180deg) translateZ(var(--transform-local-z));
         background:
             linear-gradient(0deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-max),var(--green-min),var(--blue-min),1) 100%),
             linear-gradient(90deg, rgba(var(--red-min),var(--green-max),var(--blue-max),1) 0%, rgba(var(--red-min),var(--green-min),var(--blue-max),1) 100%);
     }
 
     .surface.top {
-        transform: rotateX(90deg) rotateY(0deg) translateZ(128px);
+        transform: rotateX(90deg) rotateY(0deg) translateZ(var(--transform-local-z));
         background:
             linear-gradient(0deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-min),var(--green-min),var(--blue-max),1) 100%),
             linear-gradient(90deg, rgba(var(--red-max),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-max),var(--green-max),var(--blue-min),1) 100%);
     }
 
     .surface.bottom {
-        transform: rotateX(-90deg) rotateY(0deg) translateZ(128px);
+        transform: rotateX(-90deg) rotateY(0deg) translateZ(var(--transform-local-z));
         background:
             linear-gradient(90deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-min),var(--green-max),var(--blue-min),1) 100%),
             linear-gradient(180deg, rgba(var(--red-min),var(--green-min),var(--blue-min),1) 0%, rgba(var(--red-min),var(--green-min),var(--blue-max),1) 100%);
@@ -244,6 +245,8 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 this.getStyleSheetRule('.surface').style.setProperty('width', `${f}%`);
                 this.getStyleSheetRule('.surface').style.setProperty('height', `${f}%`);
 
+                // This zooms the surfaces when shrinking. to make it correctly it should be transform: scale(), what is a bit tricky as we than
+                // again wold have to perform some string operations to deconstruct the transform property and re-assemble it.
                 // newValue = 0.75 + newValue * 0.25;
                 // this.getStyleSheetRule('.surface').style.setProperty('zoom', `${newValue}`);
             }
@@ -254,7 +257,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 if (newValue < 0 || newValue > 1) {
                     throw(new RangeError());
                 }
-                // @Todo
+                let val = (128) + (128 / 2) * (0.25) * newValue;
+                val = 180; // @Todo
+                this.getStyleSheetRule('.cubewrapper').style.setProperty('--transform-local-z', val + 'px');
             }
             catch(e) {}
         }
@@ -386,7 +391,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      */
     get shrink() {
         let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('width'));
-        let val = (f + 100) / 1000 / 0.25; // @Todo: correct calculation
+        let val = (100 - f) / (100 * 0.25);
         return val;
     }
 
