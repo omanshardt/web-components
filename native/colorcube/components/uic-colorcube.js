@@ -251,7 +251,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 if (newValue < 0 || newValue > 1) {
                     throw(new RangeError());
                 }
-                let val = 128 + (128 / 2) * 0.25 * newValue;
+                let val = 128 + 128 * 0.25 * newValue;
                 this.getStyleSheetRule('.cubeWrapper').style.setProperty('--transform-local-z', `${val}px`);
             }
             catch(e) {}
@@ -313,7 +313,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get rotationX() {
-        return this.rotation[0];
+        if (this.hasAttribute('rotation-x')) {
+            return this.getAttribute('rotation-x');
+        }
+        else {
+            return this.rotation[0];
+        }
     }
 
     /**
@@ -333,7 +338,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get rotationY() {
-        return this.rotation[1];
+        if (this.hasAttribute('rotation-y')) {
+            return this.getAttribute('rotation-y');
+        }
+        else {
+            return this.rotation[1];
+        }
     }
 
     /**
@@ -353,8 +363,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get opacity() {
-        return this.getAttribute('opacity');
-        // return (parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('opacity')) - 0.5) * 2;
+        if (this.hasAttribute('opacity')) {
+            return this.getAttribute('opacity');
+        }
+        else {
+            return (parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('opacity')) - 0.5) * 2;
+        }
     }
 
     /**
@@ -373,10 +387,14 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get shrink() {
-        return this.getAttribute('shrink');
-        // let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('width'));
-        // let val = (100 - f) / (100 * 0.25);
-        // return val;
+        if (this.hasAttribute('shrink')) {
+            return this.getAttribute('shrink');
+        }
+        else {
+            let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('width'));
+            let val = (100 - f) / (100 * 0.25);
+            return val;
+        }
     }
 
     /**
@@ -395,10 +413,14 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get explode() {
-        return this.getAttribute('explode');
-        // let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
-        // let val = (f - 128) / ((128 / 2) * 0.25);
-        // return val;
+        if (this.hasAttribute('explode')) {
+            return this.getAttribute('explode');
+        }
+        else {
+            let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
+            let val = (f - 128) / (128 * 0.25);
+            return val;
+        }
     }
 
     /**
@@ -417,8 +439,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get borderWidth() {
-        return this.getAttribute('border-width');
-        // return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
+        if (this.hasAttribute('border-width')) {
+            return this.getAttribute('border-width');
+        }
+        else {
+            return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
+        }
     }
 
     /**
@@ -434,8 +460,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get borderRadius() {
-        return this.getAttribute('border-radius');
-        // return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
+        if (this.hasAttribute('border-radius')) {
+            return this.getAttribute('border-radius');
+        }
+        else {
+            return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
+        }
     }
 
     /**
