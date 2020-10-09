@@ -241,9 +241,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 if (newValue < 0 || newValue > 1) {
                     throw(new RangeError());
                 }
-                let f = 100 - (newValue * 100 * 0.25);
-                this.getStyleSheetRule('.surface').style.setProperty('width', `${f}%`);
-                this.getStyleSheetRule('.surface').style.setProperty('height', `${f}%`);
+                let val = 100 - (newValue * 100 * 0.25);
+                this.getStyleSheetRule('.surface').style.setProperty('width', `${val}%`);
+                this.getStyleSheetRule('.surface').style.setProperty('height', `${val}%`);
 
                 // This zooms the surfaces when shrinking. to make it correctly it should be transform: scale(), what is a bit tricky as we than
                 // again wold have to perform some string operations to deconstruct the transform property and re-assemble it.
@@ -257,9 +257,8 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 if (newValue < 0 || newValue > 1) {
                     throw(new RangeError());
                 }
-                let val = (128) + (128 / 2) * (0.25) * newValue;
-                val = 180; // @Todo
-                this.getStyleSheetRule('.cubewrapper').style.setProperty('--transform-local-z', val + 'px');
+                let val = 128 + (128 / 2) * 0.25 * newValue;
+                this.getStyleSheetRule('.cubeWrapper').style.setProperty('--transform-local-z', `${val}px`);
             }
             catch(e) {}
         }
@@ -411,7 +410,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get explode() {
-        return ''; // @Todo
+        let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
+        let val = (f - 128) / ((128 / 2) * 0.25);
+        return val;
     }
 
     /**
