@@ -220,12 +220,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
             catch(e) {}
         }
-        else if (attributeName === 'border-width') {
-            try {
-                this.getStyleSheetRule('.surface').style.setProperty('border-width', `${newValue}px`);
-            }
-            catch(e) {}
-        }
         else if (attributeName === 'opacity') {
             try {
                 if (newValue < 0 || newValue > 1) {
@@ -259,6 +253,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 }
                 let val = 128 + (128 / 2) * 0.25 * newValue;
                 this.getStyleSheetRule('.cubeWrapper').style.setProperty('--transform-local-z', `${val}px`);
+            }
+            catch(e) {}
+        }
+        else if (attributeName === 'border-width') {
+            try {
+                this.getStyleSheetRule('.surface').style.setProperty('border-width', `${newValue}px`);
             }
             catch(e) {}
         }
@@ -308,7 +308,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     };
 
 
-
     /**
      *
      * @returns {*}
@@ -353,24 +352,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      *
      * @returns {*}
      */
-    get borderWidth() {
-        return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
-    }
-
-    /**
-     * @param val
-     */
-    set borderWidth(val) {
-        this.setAttribute('border-width', val);
-    }
-
-
-    /**
-     *
-     * @returns {*}
-     */
     get opacity() {
-        return (parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('opacity')) - 0.5) * 2;
+        return this.getAttribute('opacity');
+        // return (parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('opacity')) - 0.5) * 2;
     }
 
     /**
@@ -389,9 +373,10 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get shrink() {
-        let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('width'));
-        let val = (100 - f) / (100 * 0.25);
-        return val;
+        return this.getAttribute('shrink');
+        // let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('width'));
+        // let val = (100 - f) / (100 * 0.25);
+        // return val;
     }
 
     /**
@@ -410,9 +395,10 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {*}
      */
     get explode() {
-        let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
-        let val = (f - 128) / ((128 / 2) * 0.25);
-        return val;
+        return this.getAttribute('explode');
+        // let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
+        // let val = (f - 128) / ((128 / 2) * 0.25);
+        // return val;
     }
 
     /**
@@ -430,8 +416,26 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      *
      * @returns {*}
      */
+    get borderWidth() {
+        return this.getAttribute('border-width');
+        // return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
+    }
+
+    /**
+     * @param val
+     */
+    set borderWidth(val) {
+        this.setAttribute('border-width', val);
+    }
+
+
+    /**
+     *
+     * @returns {*}
+     */
     get borderRadius() {
-        return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
+        return this.getAttribute('border-radius');
+        // return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
     }
 
     /**
@@ -450,8 +454,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @returns {boolean}
      */
     get rotatable() {
-        let b = this.hasAttribute('rotatable');
-        return b;
+        return this.hasAttribute('rotatable');
     }
 
     /**
