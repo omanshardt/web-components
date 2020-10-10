@@ -26,7 +26,19 @@ template.innerHTML = `
         width:256px;
         height:256px;
         transform-style: preserve-3d;
-        transform: scale(1, 1) perspective(var(--perspective));
+        transform: scale(1, 1);
+        /* zoom / transform: scale() is set via javascript */
+
+        /*border:1px solid red;*/
+    }
+
+    .perspectiveWrapper {
+        box-sizing:border-box;
+        width:100%;
+        height:100%;
+        transform-style: preserve-3d;
+        transform: perspective(var(--perspective));
+        transition: transform 0.5s;
         /* zoom / transform: scale() is set via javascript */
 
         /*border:1px solid red;*/
@@ -79,6 +91,7 @@ template.innerHTML = `
         border-style:solid;
         border-color:#fff;
         opacity:1;
+        transition: opacity 0.5s, border-radius 0.5s, transform 0.5s, width 0.5s, height 0.5s, border-width 0.5s;
     }
 
     .surface.left {
@@ -133,17 +146,19 @@ template.innerHTML = `
 </style>
 <div class="cubeWrapper">
     <div class="zoomWrapper">
-        <div class="rotationWrapper_1">
-          <div class="rotationWrapper_2">
-            <div class="cube">
-              <div class="surface left"><span>left</span></div>
-              <div class="surface front"><span>front</span></div>
-              <div class="surface right"><span>right</span></div>
-              <div class="surface back"><span>back</span></div>
-              <div class="surface top"><span>top</span></div>
-              <div class="surface bottom"><span>bottom</span></div>
+        <div class="perspectiveWrapper">
+            <div class="rotationWrapper_1">
+              <div class="rotationWrapper_2">
+                <div class="cube">
+                  <div class="surface left"><span>left</span></div>
+                  <div class="surface front"><span>front</span></div>
+                  <div class="surface right"><span>right</span></div>
+                  <div class="surface back"><span>back</span></div>
+                  <div class="surface top"><span>top</span></div>
+                  <div class="surface bottom"><span>bottom</span></div>
+                </div>
+              </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
@@ -162,10 +177,10 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             for (const entry of entries) {
                 let s = Math.min(entry.contentRect.width, entry.contentRect.height)
                 let z = s/256 * 0.55;
-                // this.shadowRoot.querySelector('.zoomWrapper').style.transform = `scale(${z}, ${z}) perspective(var(--perspective))`;
+                // this.shadowRoot.querySelector('.zoomWrapper').style.transform = `scale(${z}, ${z})`;
                 try
                 {
-                    this.getStyleSheetRule('.zoomWrapper').style.setProperty('transform', `scale(${z}, ${z}) perspective(var(--perspective))`);
+                    this.getStyleSheetRule('.zoomWrapper').style.setProperty('transform', `scale(${z}, ${z})`);
                 }
                 catch(e) {}
             }
@@ -270,14 +285,18 @@ customElements.define('uic-colorcube', class extends HTMLElement {
                 throw(new RangeError());
             }
             try {
-                let val = 1280 + 1280 * 0.75 * newValue;
-                this.getStyleSheetRule('.cubeWrapper').style.setProperty('--perspective', `${val}px`);
+                let val = 1280 + 1280 * 0.6 * newValue;
+                this.getStyleSheetRule('.perspectiveWrapper').style.setProperty('--perspective', `${val}px`);
             }
             catch(e) {}
         }
         else if (attributeName === 'border-width') {
+            if (newValue < 0 || newValue > 1) {
+                throw(new RangeError());
+            }
             try {
-                this.getStyleSheetRule('.surface').style.setProperty('border-width', `${newValue}px`);
+                let val = 20 * newValue;
+                this.getStyleSheetRule('.surface').style.setProperty('border-width', `${val}px`);
             }
             catch(e) {}
         }
@@ -486,7 +505,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         }
         else {
             let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--perspective'));
-            let val = (f - 1280) / (1280 * 0.75);
+            let val = (f - 1280) / (1280 * 0.60);
             return val;
         }
     }
@@ -511,7 +530,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             return this.getAttribute('border-width');
         }
         else {
-            return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
+            let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-width'));
+            let val = f / 20;
+            return val;
         }
     }
 
@@ -631,5 +652,34 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
         }
         return null;
+    }
+
+
+    bind(element, property) {
+        let elm = this;
+        let val = null;
+        let transition = null;
+        let selector = (property === 'perspective') ? '.perspectiveWrapper' : '.surface';
+        element.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+            val = this.value;
+        });
+        element.addEventListener('input', function(e) {
+            e.preventDefault();
+            if (Math.abs(this.value - val) < 0.05 && transition === null) {
+                transition = elm.getStyleSheetRule(selector).style.getPropertyValue('transition');
+                elm.getStyleSheetRule(selector).style.removeProperty('transition');
+            }
+            elm[property] = this.value;
+            val = this.value;
+        });
+        element.addEventListener('mouseup', function(e) {
+            // e.preventDefault();
+            if (transition !== null) {
+                elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
+                transition = null;
+            }
+        });
+        // element.addEventListener('click', function(e) { e.preventDefault(); console.log('click') });
     }
 });
