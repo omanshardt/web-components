@@ -10,6 +10,7 @@ template.innerHTML = `
         --blue-min: 0;
         --blue-max: 255;
         --transform-local-z: 128px;
+        --perspective:1280px;
         box-sizing:border-box;
         height:100%;
         width:100%;
@@ -25,7 +26,7 @@ template.innerHTML = `
         width:256px;
         height:256px;
         transform-style: preserve-3d;
-        transform: perspective(1280px);
+        transform: scale(1, 1) perspective(var(--perspective));
         /* zoom / transform: scale() is set via javascript */
 
         /*border:1px solid red;*/
@@ -161,7 +162,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             for (const entry of entries) {
                 let s = Math.min(entry.contentRect.width, entry.contentRect.height)
                 let z = s/256 * 0.55;
-                this.shadowRoot.querySelector('.zoomWrapper').style.transform = `scale(${z}, ${z}) perspective(1280px)`;
+                // this.shadowRoot.querySelector('.zoomWrapper').style.transform = `scale(${z}, ${z}) perspective(var(--perspective))`;
+                try
+                {
+                    this.getStyleSheetRule('.zoomWrapper').style.setProperty('transform', `scale(${z}, ${z}) perspective(var(--perspective))`);
+                }
+                catch(e) {}
             }
         });
         resizeObserver.observe(this.shadowRoot.querySelector('.cubeWrapper'));
@@ -172,9 +178,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         if (this.hasAttribute('rotation-y')) {
             this.rotationY = this.getAttribute('rotation-y');
         }
-        if (this.hasAttribute('border-width')) {
-            this.borderWidth = this.getAttribute('border-width');
-        }
         if (this.hasAttribute('opacity')) {
             this.opacity = this.getAttribute('opacity');
         }
@@ -183,6 +186,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         }
         if (this.hasAttribute('explode')) {
             this.explode = this.getAttribute('explode');
+        }
+        if (this.hasAttribute('perspective')) {
+            this.perspective = this.getAttribute('perspective');
+        }
+        if (this.hasAttribute('border-width')) {
+            this.borderWidth = this.getAttribute('border-width');
         }
         if (this.hasAttribute('border-radius')) {
             this.borderRadius = this.getAttribute('border-radius');
@@ -256,6 +265,16 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             }
             catch(e) {}
         }
+        else if (attributeName === 'perspective') {
+            try {
+                if (newValue < -1 || newValue > 1) {
+                    throw(new RangeError());
+                }
+                let val = 1280 + 1280 * 0.75 * newValue;
+                this.getStyleSheetRule('.cubeWrapper').style.setProperty('--perspective', `${val}px`);
+            }
+            catch(e) {}
+        }
         else if (attributeName === 'border-width') {
             try {
                 this.getStyleSheetRule('.surface').style.setProperty('border-width', `${newValue}px`);
@@ -274,7 +293,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ['rotatable', 'rotation-x', 'rotation-y', 'border-width', 'opacity', 'shrink', 'explode', 'border-radius'];
+        return ['rotatable', 'rotation-x', 'rotation-y', 'opacity', 'shrink', 'explode', 'perspective', 'border-width', 'border-radius'];
     }
 
 
@@ -306,6 +325,28 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             return [null, null, null];
         }
     };
+
+
+    /**
+     * This indicates if the cube is rotatable by mouse / touch events or not
+     * @returns {boolean}
+     */
+    get rotatable() {
+        return this.hasAttribute('rotatable');
+    }
+
+    /**
+     * This defines if the cube is rotatable or not
+     * @param isRotatable
+     */
+    set rotatable(isRotatable) {
+        if (isRotatable === true) {
+            this.setAttribute('rotatable', '');
+        }
+        else if (isRotatable === false) {
+            this.removeAttribute('rotatable');
+        }
+    }
 
 
     /**
@@ -438,6 +479,32 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      *
      * @returns {*}
      */
+    get perspective() {
+        if (this.hasAttribute('perspective')) {
+            return this.getAttribute('perspective');
+        }
+        else {
+            let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--perspective'));
+            let val2 = (f - 1280) / (1280 * 0.75);
+            return val2;
+        }
+    }
+
+    /**
+     * @param val
+     */
+    set perspective(val) {
+        if (val < -1 || val > 1) {
+            throw(new RangeError());
+        }
+        this.setAttribute('perspective', val);
+    }
+
+
+    /**
+     *
+     * @returns {*}
+     */
     get borderWidth() {
         if (this.hasAttribute('border-width')) {
             return this.getAttribute('border-width');
@@ -478,27 +545,6 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         this.setAttribute('border-radius', val);
     }
 
-
-    /**
-     * This indicates if the cube is rotatable by mouse / touch events or not
-     * @returns {boolean}
-     */
-    get rotatable() {
-        return this.hasAttribute('rotatable');
-    }
-
-    /**
-     * This defines if the cube is rotatable or not
-     * @param isRotatable
-     */
-    set rotatable(isRotatable) {
-        if (isRotatable === true) {
-            this.setAttribute('rotatable', '');
-        }
-        else if (isRotatable === false) {
-            this.removeAttribute('rotatable');
-        }
-    }
 
 
     /**
