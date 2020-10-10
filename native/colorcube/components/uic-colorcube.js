@@ -230,20 +230,20 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             catch(e) {}
         }
         else if (attributeName === 'opacity') {
+            if (newValue < 0 || newValue > 1) {
+                throw(new RangeError());
+            }
             try {
-                if (newValue < 0 || newValue > 1) {
-                    throw(new RangeError());
-                }
                 newValue = 0.5 + newValue / 2;
                 this.getStyleSheetRule('.surface').style.setProperty('opacity', `${newValue}`);
             }
             catch(e) {}
         }
         else if (attributeName === 'shrink') {
+            if (newValue < 0 || newValue > 1) {
+                throw(new RangeError());
+            }
             try {
-                if (newValue < 0 || newValue > 1) {
-                    throw(new RangeError());
-                }
                 let val = 100 - (newValue * 100 * 0.25);
                 this.getStyleSheetRule('.surface').style.setProperty('width', `${val}%`);
                 this.getStyleSheetRule('.surface').style.setProperty('height', `${val}%`);
@@ -256,20 +256,20 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             catch(e) {}
         }
         else if (attributeName === 'explode') {
+            if (newValue < 0 || newValue > 1) {
+                throw(new RangeError());
+            }
             try {
-                if (newValue < 0 || newValue > 1) {
-                    throw(new RangeError());
-                }
                 let val = 128 + 128 * 0.25 * newValue;
                 this.getStyleSheetRule('.cubeWrapper').style.setProperty('--transform-local-z', `${val}px`);
             }
             catch(e) {}
         }
         else if (attributeName === 'perspective') {
+            if (newValue < -1 || newValue > 1) {
+                throw(new RangeError());
+            }
             try {
-                if (newValue < -1 || newValue > 1) {
-                    throw(new RangeError());
-                }
                 let val = 1280 + 1280 * 0.75 * newValue;
                 this.getStyleSheetRule('.cubeWrapper').style.setProperty('--perspective', `${val}px`);
             }
@@ -282,11 +282,12 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             catch(e) {}
         }
         else if (attributeName === 'border-radius') {
-            if (newValue < 0 || newValue > 50) {
+            if (newValue < 0 || newValue > 1) {
                 throw(new RangeError());
             }
             try {
-                this.getStyleSheetRule('.surface').style.setProperty('border-radius', `${newValue}%`);
+                let val = 50 * newValue;
+                this.getStyleSheetRule('.surface').style.setProperty('border-radius', `${val}%`);
             }
             catch(e) {}
         }
@@ -485,8 +486,8 @@ customElements.define('uic-colorcube', class extends HTMLElement {
         }
         else {
             let f = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--perspective'));
-            let val2 = (f - 1280) / (1280 * 0.75);
-            return val2;
+            let val = (f - 1280) / (1280 * 0.75);
+            return val;
         }
     }
 
@@ -531,7 +532,9 @@ customElements.define('uic-colorcube', class extends HTMLElement {
             return this.getAttribute('border-radius');
         }
         else {
-            return parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
+            let f = parseFloat(this.getStyleSheetRule('.surface').style.getPropertyValue('border-radius'));
+            let val = f / 50;
+            return val;
         }
     }
 
@@ -539,7 +542,7 @@ customElements.define('uic-colorcube', class extends HTMLElement {
      * @param val
      */
     set borderRadius(val) {
-        if (val < 0 || val > 50) {
+        if (val < 0 || val > 1) {
             throw(new RangeError());
         }
         this.setAttribute('border-radius', val);
