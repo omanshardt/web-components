@@ -242,7 +242,8 @@
                         $surface.addEventListener('dblclick', function (e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            $elm.$selectedSurface = this;
+                            $elm.selectedSurfaceZ = 1; // reset the currently selected surface
+                            $elm.$selectedSurface = this; // set double-clicked surface as selected surface
                             let surfaceId = this.classList[1];
                             console.log($elm.$selectedSurface, surfaceId);
                             $elm.surfaceSelectionCallback(this.$selectedSurface, surfaceId);
@@ -254,8 +255,9 @@
                             clearTimeout($elm.timeout);
                             if (tapLength > 0 && tapLength < 400) {
                                 e.preventDefault();
-                                e.stopPropagation();
-                                $elm.$selectedSurface = this;
+                                // e.stopPropagation();
+                                $elm.selectedSurfaceZ = 1; // reset the currently selected surface
+                                $elm.$selectedSurface = this; // set double-clicked surface as selected surface
                                 let surfaceId = this.classList[1];
                                 console.log($elm.$selectedSurface, surfaceId);
                                 $elm.surfaceSelectionCallback(this.$selectedSurface, surfaceId);
@@ -599,6 +601,32 @@
         }
 
 
+        get selectedSurfaceTransformString() {
+            let selector = '.' + Array.from(this.$selectedSurface.classList).join('.');
+            let transform = this.getStyleSheetRule(selector).style.getPropertyValue('transform');
+            return transform;
+        }
+
+
+        get selectedSurfaceZ() {
+            let defaultZ = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
+            let  currentZ = this.$selectedSurface.computedStyleMap().get('transform')[2]['z']['value'];
+            return currentZ / defaultZ;
+        }
+
+        set selectedSurfaceZ(val) {
+            if (val < -1 || val > 1) {
+                throw(new RangeError());
+            }
+            let selector = '.' + Array.from(this.$selectedSurface.classList).join('.');
+            let transform = this.selectedSurfaceTransformString;
+            const regex = /translateZ\(.*\)/gm;
+            const subst = `translateZ(calc(var(--transform-local-z) * ${val}))`;
+            const result = transform.replace(regex, subst);
+            this.getStyleSheetRule(selector).style.setProperty('transform', result);
+        }
+
+
         /**
          * This initializes the rotating capabilities of the cube and sets the starting values
          * @param e
@@ -632,6 +660,7 @@
 
             document.addEventListener('touchmove', _rotate, {passive: false});
             document.addEventListener('touchend', _stopRotating, {passive: false});
+            console.log('start');
         };
 
         /**
@@ -672,6 +701,7 @@
 
             document.removeEventListener('touchmove', rotateHandler, {passive: false});
             document.removeEventListener('touchend', stopRotatingHandler, {passive: false});
+            console.log('stop');
         };
 
 
@@ -694,43 +724,100 @@
             let elm = this;
             let val = null;
             let transition = null;
-            let selector = (property === 'perspective') ? '.perspectiveWrapper' : '.surface';
-            element.addEventListener('mousedown', function (e) {
-                e.stopPropagation();
-                val = this.value;
-                console.log('mousedown');
-            }, {passive: true });
-            element.addEventListener('touchstart', function (e) {
-                e.stopPropagation();
-                val = this.value;
-                console.log('touchstart');
-            }, {passive: true });
-            element.addEventListener('input', function (e) {
-                if (Math.abs(this.value - val) < 0.05 && transition === null) {
-                    transition = elm.getStyleSheetRule(selector).style.getPropertyValue('transition');
-                    elm.getStyleSheetRule(selector).style.removeProperty('transition');
-                    console.log('input', this.value, val);
-                }
-                elm[property] = this.value;
-                val = this.value;
-            }, {passive: true });
-            element.addEventListener('mouseup', function (e) {
-                // e.preventDefault();
-                if (transition !== null) {
-                    elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
-                    transition = null;
-                }
-                console.log('mouseup');
-            }, {passive: true });
-            element.addEventListener('touchend', function (e) {
-                // e.preventDefault();
-                if (transition !== null) {
-                    elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
-                    transition = null;
-                }
-                console.log('touchend');
-            }, {passive: true });
-            // element.addEventListener('click', function(e) { e.preventDefault(); console.log('click') });
+            let selector = null;
+            if (property === 'moveSurface') {
+                selector = '.' + Array.from(elm.$selectedSurface.classList).join('.');
+                let opacity = null;
+                element.addEventListener('mousedown', function (e) {
+                    e.stopPropagation();
+                    val = this.value;
+
+                    opacity = elm.getStyleSheetRule('.surface').style.getPropertyValue('opacity');
+                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', '0.025');
+
+                    elm.$selectedSurface.style.opacity = '1';
+
+                    console.log('mousedown')
+                }, {passive: true});
+                element.addEventListener('touchstart', function (e) {
+                    e.stopPropagation();
+                    val = this.value;
+
+                    opacity = elm.getStyleSheetRule('.surface').style.getPropertyValue('opacity');
+                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', '0.025');
+
+                    elm.$selectedSurface.style.opacity = '1';
+
+                    console.log('touchstart')
+                }, {passive: true});
+
+                element.addEventListener('input', function (e) {
+                    if (Math.abs(this.value - val) < 0.05 && transition === null) {
+                        elm.$selectedSurface.style.transition = 'none';
+                        console.log('input', this.value, val);
+                    }
+                    elm['selectedSurfaceZ'] = this.value;
+                    val = this.value;
+                }, {passive: true});
+
+                element.addEventListener('mouseup', function (e) {
+                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', opacity);
+
+                    elm.$selectedSurface.style.transition = '';
+                    elm.$selectedSurface.style.opacity = '';
+                    console.log('mouseup')
+                }, {passive: true});
+                element.addEventListener('touchend', function (e) {
+                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', opacity);
+
+                    elm.$selectedSurface.style.transition = '';
+                    elm.$selectedSurface.style.opacity = '';
+                    console.log('touchend')
+                }, {passive: true});
+            }
+            else {
+                selector = (property === 'perspective') ? '.perspectiveWrapper' : '.surface';
+                element.addEventListener('mousedown', function (e) {
+                    e.stopPropagation();
+                    val = this.value;
+                    console.log('mousedown');
+                }, {passive: true});
+                element.addEventListener('touchstart', function (e) {
+                    e.stopPropagation();
+                    val = this.value;
+                    console.log('touchstart');
+                }, {passive: true});
+
+                element.addEventListener('input', function (e) {
+                    if (Math.abs(this.value - val) < 0.05 && transition === null) {
+                        transition = elm.getStyleSheetRule(selector).style.getPropertyValue('transition');
+                        elm.getStyleSheetRule(selector).style.removeProperty('transition');
+                        console.log('input', this.value, val);
+                    }
+                    elm[property] = this.value;
+                    val = this.value;
+                }, {passive: true});
+
+                element.addEventListener('mouseup', function (e) {
+                    // e.preventDefault();
+                    if (transition !== null) {
+                        elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
+                        transition = null;
+                    }
+                    console.log('mouseup');
+                    val = null;
+                }, {passive: true});
+                element.addEventListener('touchend', function (e) {
+                    // e.preventDefault();
+                    if (transition !== null) {
+                        elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
+                        transition = null;
+                    }
+                    val = null;
+                    console.log('touchend');
+                }, {passive: true});
+                // element.addEventListener('click', function(e) { e.preventDefault(); console.log('click') });
+            }
         }
     });
 })();
