@@ -164,7 +164,9 @@
         constructor() {
             super();
             this.attachShadow({mode: 'open'});
+            this.$selectedSurface = null;
             this.shadowRoot.appendChild(template.content.cloneNode(true));
+            this.surfaceSelectionCallback = new Function();
         }
 
         connectedCallback() {
@@ -172,14 +174,22 @@
                 for (const entry of entries) {
                     let s = Math.min(entry.contentRect.width, entry.contentRect.height)
                     let z = s / 256 * 0.55;
-                    // this.shadowRoot.querySelector('.zoomWrapper').style.transform = `scale(${z}, ${z})`;
                     try {
+                        // if available space is less than 256px than we need to adapt the original size of the cube as it cannot exceed the size of the available space in certain circumstances
+                        let size = Math.min(s, 256);
+                        let tZ = size / 2;
+                        this.getStyleSheetRule('.cubeWrapper').style.setProperty('--transform-local-z', `${tZ}px`);
+                        this.getStyleSheetRule('.zoomWrapper').style.setProperty('width', `${size}px`);
+                        this.getStyleSheetRule('.zoomWrapper').style.setProperty('height', `${size}px`);
+
                         this.getStyleSheetRule('.zoomWrapper').style.setProperty('transform', `scale(${z}, ${z})`);
                     } catch (e) {
                     }
                 }
             });
             resizeObserver.observe(this.shadowRoot.querySelector('.cubeWrapper'));
+            this.$selectedSurface = this.shadowRoot.querySelector('.surface.front');
+            this.surfaceSelectionCallback(this.$selectedSurface, 'front');
             // this initially transfers the attribute values ('rotation-x' and 'rotation-y') to the corresponding CSSRule
             if (this.hasAttribute('rotation-x')) {
                 this.rotationX = this.getAttribute('rotation-x');
@@ -217,8 +227,10 @@
 
         attributeChangedCallback(attributeName, oldValue, newValue) {
             if (attributeName === 'rotatable') {
+                let $elm = this;
                 let surfaces = this.shadowRoot.querySelectorAll('.surface');
                 if (this.hasAttribute('rotatable')) {
+                    // This adds event handlers for rotating the cube
                     this.shadowRoot.querySelector('.cubeWrapper').addEventListener('mousedown', this.startRotating, {passive: false});
                     this.shadowRoot.querySelector('.cubeWrapper').addEventListener('touchstart', this.startRotating, {passive: false});
 
@@ -230,7 +242,30 @@
                         $surface.addEventListener('dblclick', function (e) {
                             e.preventDefault();
                             e.stopPropagation();
+                            $elm.$selectedSurface = this;
+                            let surfaceId = this.classList[1];
+                            console.log($elm.$selectedSurface, surfaceId);
+                            $elm.surfaceSelectionCallback(this.$selectedSurface, surfaceId);
                         });
+
+                        $surface.addEventListener('touchend', function(e) {
+                            let currentTime = new Date().getTime();
+                            let tapLength = currentTime - $elm.lastTap;
+                            clearTimeout($elm.timeout);
+                            if (tapLength > 0 && tapLength < 400) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                $elm.$selectedSurface = this;
+                                let surfaceId = this.classList[1];
+                                console.log($elm.$selectedSurface, surfaceId);
+                                $elm.surfaceSelectionCallback(this.$selectedSurface, surfaceId);
+                            }
+                            else {
+                                $elm.lastTap = currentTime;
+                            }
+                        } ,{passive: false});
+
+
                     });
                 } else {
                     this.shadowRoot.querySelector('.cubeWrapper').removeEventListener('mousedown', this.startRotating, {passive: false});
