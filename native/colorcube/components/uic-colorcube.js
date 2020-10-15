@@ -622,6 +622,7 @@
         }
 
         set selectedSurfaceZPosition(val) {
+            console.log('selectedSurfaceZPosition', val);
             if (val < -1 || val > 1) {
                 throw(new RangeError());
             }
@@ -635,18 +636,18 @@
 
 
         emphasizeSelectedSurface() {
-            this.getStyleSheetRule('.surface.surface').style.setProperty('transition', 'opacity 0.2s');
+            this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.2s');
             let toid = setTimeout( () => {
-                this.getStyleSheetRule('.surface.surface').style.removeProperty('transition');
+                this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.75s');
             }, 200);
             this.getStyleSheetRule('.surface.surface').style.setProperty('opacity', '0.025');
             this.$selectedSurface.style.opacity = '1';
         }
 
         deEmphasizeSelectedSurface() {
-            this.getStyleSheetRule('.surface.surface').style.setProperty('transition', 'opacity 0.2s');
+            this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.2s');
             let toid = setTimeout( () => {
-                this.getStyleSheetRule('.surface.surface').style.removeProperty('transition');
+                this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.75s');
             }, 200);
             this.getStyleSheetRule('.surface.surface').style.removeProperty('opacity');
             this.$selectedSurface.style.opacity = '';
@@ -754,14 +755,13 @@
             if (property === 'moveSurface') {
                 selector = '.' + Array.from(elm.$selectedSurface.classList).join('.');
                 let opacity = null;
+                var toid = null;
                 element.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
+
                     val = this.value;
-
-                    opacity = elm.getStyleSheetRule('.surface').style.getPropertyValue('opacity');
-                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', '0.025');
-
-                    elm.$selectedSurface.style.opacity = '1';
+                    elm.emphasizeSelectedSurface();
+                    toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
 
                     console.log('mousedown')
                 }, {passive: true});
@@ -780,17 +780,24 @@
                 element.addEventListener('input', function (e) {
                     if (Math.abs(this.value - val) < 0.05 && transition === null) {
                         elm.$selectedSurface.style.transition = 'none';
-                        console.log('input', this.value, val);
+                        clearTimeout(toid);
+                        toid = null;
+                        console.log('input conti', this.value, val);
                     }
                     elm['selectedSurfaceZPosition'] = this.value;
                     val = this.value;
+                    console.log('input', this.value, val);
                 }, {passive: true});
 
                 element.addEventListener('mouseup', function (e) {
-                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', opacity);
+                    // elm.getStyleSheetRule('.surface').style.setProperty('opacity', opacity);
+
+                    if (toid === null) {
+                            elm.deEmphasizeSelectedSurface();
+                    }
+                    toid = null;
 
                     elm.$selectedSurface.style.transition = '';
-                    elm.$selectedSurface.style.opacity = '';
                     console.log('mouseup')
                 }, {passive: true});
                 element.addEventListener('touchend', function (e) {
