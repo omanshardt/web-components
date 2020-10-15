@@ -194,7 +194,9 @@
                     try {
                         // if available space is less than 256px than we need to adapt the original size of the cube as it cannot exceed the size of the available space in certain circumstances
                         let size = Math.min(s, 256);
-                        let tZ = size / 2;
+                        // let tZ = size / 2;
+                        let val = this.explode;
+                        let tZ = (size / 2) + size / 2 * 0.25 * val;
                         this.getStyleSheetRule('.cubeWrapper').style.setProperty('--transform-local-z', `${tZ}px`);
                         this.getStyleSheetRule('.zoomWrapper').style.setProperty('width', `${size}px`);
                         this.getStyleSheetRule('.zoomWrapper').style.setProperty('height', `${size}px`);
