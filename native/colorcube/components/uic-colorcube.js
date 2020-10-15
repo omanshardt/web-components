@@ -9,6 +9,14 @@
                 --green-max: 255;
                 --blue-min: 0;
                 --blue-max: 255;
+
+                --front-zColor: calc(var(--blue-max) * 0);
+                --back-zColor: calc(var(--blue-max) * 1);
+                --left-zColor: calc(var(--green-max) * 0);
+                --right-zColor: calc(var(--green-max) * 1);
+                --bottom-zColor: calc(var(--red-max) * 0);
+                --top-zColor: calc(var(--red-max) * 1);
+
                 --transform-local-z: 128px;
                 --perspective: 1280px;
                 --generalTransitionTime: 0.75s;
@@ -20,6 +28,8 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                transition: --front-zColor 0.75s;
+                /* -webkit-touch-callout: none !important; */
 
                 /*border:1px solid yellow;*/
             }
@@ -104,37 +114,37 @@
 
             .surface.left {
                 transform: rotateX(0deg) rotateY(-90deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 100%),
+                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--left-zColor), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--left-zColor), var(--blue-min), 1) 100%),
                 linear-gradient(90deg, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 100%);
             }
 
             .surface.front {
                 transform: rotateX(0deg) rotateY(0deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 100%),
+                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--front-zColor), 1) 0%, rgba(var(--red-max), var(--green-min), var(--front-zColor), 1) 100%),
                 linear-gradient(90deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-max), var(--blue-min), 1) 100%);
             }
 
             .surface.right {
                 transform: rotateX(0deg) rotateY(90deg) translateZ(var(--transform-local-z));
                 background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-max), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-max), var(--blue-max), 1) 100%);
+                linear-gradient(90deg, rgba(var(--red-min), var(--right-zColor), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--right-zColor), var(--blue-max), 1) 100%);
             }
 
             .surface.back {
                 transform: rotateX(0deg) rotateY(180deg) translateZ(var(--transform-local-z));
                 background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-max), var(--blue-max), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 100%);
+                linear-gradient(90deg, rgba(var(--red-min), var(--green-max), var(--back-zColor), 1) 0%, rgba(var(--red-min), var(--green-min), var(--back-zColor), 1) 100%);
             }
 
             .surface.top {
                 transform: rotateX(90deg) rotateY(0deg) translateZ(var(--transform-local-z));
                 background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-max), var(--blue-min), 1) 100%);
+                linear-gradient(90deg, rgba(var(--top-zColor), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--top-zColor), var(--green-max), var(--blue-min), 1) 100%);
             }
 
             .surface.bottom {
                 transform: rotateX(-90deg) rotateY(0deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(90deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-max), var(--blue-min), 1) 100%),
+                background-image: linear-gradient(90deg, rgba(var(--bottom-zColor), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--bottom-zColor), var(--green-max), var(--blue-min), 1) 100%),
                 linear-gradient(180deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 100%);
             }
 
@@ -628,24 +638,29 @@
             }
             let selector = '.' + Array.from(this.$selectedSurface.classList).join('.');
             let transform = this.selectedSurfaceTransformString;
+            let surface = this.$selectedSurface.classList[1];
+            let propertyName = `--${surface}-zColor`; // property name (css variable name) for the color on z-axis of each surface;
+
+            let colorVal = (surface == 'front' || surface == 'left' || surface == 'bottom') ?  1 - (parseFloat(val) + 1) / 2 : (parseFloat(val) + 1) / 2; // value for the color on z-axis of each surface (from 0 to 255 or from 255 to 0)
             const regex = /translateZ\(.*\)/gm;
             const subst = `translateZ(calc(var(--transform-local-z) * ${val}))`;
             const result = transform.replace(regex, subst);
             this.getStyleSheetRule(selector).style.setProperty('transform', result);
+            this.getStyleSheetRule ('.cubeWrapper').style.setProperty(propertyName, `calc(var(--blue-max) * ${colorVal})`);
         }
 
 
         emphasizeSelectedSurface() {
-            this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.2s');
+            this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.35s');
             let toid = setTimeout( () => {
                 this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.75s');
             }, 200);
-            this.getStyleSheetRule('.surface.surface').style.setProperty('opacity', '0.025');
+            this.getStyleSheetRule('.surface.surface').style.setProperty('opacity', '0.05');
             this.$selectedSurface.style.opacity = '1';
         }
 
         deEmphasizeSelectedSurface() {
-            this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.2s');
+            this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.35s');
             let toid = setTimeout( () => {
                 this.getStyleSheetRule('.cubeWrapper').style.setProperty('--opacityTransitionTime', '0.75s');
             }, 200);
@@ -756,15 +771,18 @@
                 selector = '.' + Array.from(elm.$selectedSurface.classList).join('.');
                 let opacity = null;
                 var toid = null;
-                element.addEventListener('mousedown', function (e) {
+                // element.addEventListener('contextmenu', function(e) { console.log('cm'); e.preventDefault(); e.stopPropagation() } )
+                // element.parentElement.addEventListener('touchstart', function (e) { console.log('yolo'); e.stopPropagation(); e.preventDefault();}, {passive: false});
+                element.addEventListener('mousedown', function (e) { // @Todo: keep emphasing as long as mouse is pressed
                     e.stopPropagation();
+                    // e.preventDefault();
 
                     val = this.value;
                     elm.emphasizeSelectedSurface();
                     toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
 
-                    console.log('mousedown')
-                }, {passive: true});
+                    console.log('mousedown');
+                }, {passive: false});
                 element.addEventListener('touchstart', function (e) {
                     e.stopPropagation();
 
@@ -772,8 +790,8 @@
                     elm.emphasizeSelectedSurface();
                     toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
 
-                    console.log('touchstart')
-                }, {passive: true});
+                    console.log('touchstart');
+                }, {passive: false});
 
                 element.addEventListener('input', function (e) {
                     if (Math.abs(this.value - val) < 0.05 && transition === null) {
