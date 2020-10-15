@@ -11,6 +11,9 @@
                 --blue-max: 255;
                 --transform-local-z: 128px;
                 --perspective: 1280px;
+                --generalTransitionTime: 0.75s;
+                --opacityTransitionTime: 0.75s;
+                --movingTransitionTime: 0.75s;
                 box-sizing: border-box;
                 height: 100%;
                 width: 100%;
@@ -38,7 +41,7 @@
                 height: 100%;
                 transform-style: preserve-3d;
                 transform: perspective(var(--perspective));
-                transition: transform 0.75s;
+                transition: transform var(--generalTransitionTime);
                 /* zoom / transform: scale() is set via javascript */
 
                 /*border:1px solid red;*/
@@ -92,7 +95,11 @@
                 border-style: solid;
                 border-color: #fff;
                 opacity: 1;
-                transition: opacity 0.75s, border-radius 0.75s, transform 0.75s, width 0.75s, height 0.75s, border-width 0.75s;
+                transition: opacity var(--opacityTransitionTime), border-radius var(--generalTransitionTime), transform var(--generalTransitionTime), width var(--generalTransitionTime), height var(--generalTransitionTime), border-width var(--generalTransitionTime);
+            }
+            
+            .surface.surface {
+            
             }
 
             .surface.left {
@@ -242,7 +249,7 @@
                         $surface.addEventListener('dblclick', function (e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            $elm.selectedSurfaceZ = 1; // reset the currently selected surface
+                            $elm.selectedSurfaceZPosition = 1; // reset the currently selected surface
                             $elm.$selectedSurface = this; // set double-clicked surface as selected surface
                             let surfaceId = this.classList[1];
                             console.log($elm.$selectedSurface, surfaceId);
@@ -256,7 +263,7 @@
                             if (tapLength > 0 && tapLength < 400) {
                                 e.preventDefault();
                                 // e.stopPropagation();
-                                $elm.selectedSurfaceZ = 1; // reset the currently selected surface
+                                $elm.selectedSurfaceZPosition = 1; // reset the currently selected surface
                                 $elm.$selectedSurface = this; // set double-clicked surface as selected surface
                                 let surfaceId = this.classList[1];
                                 console.log($elm.$selectedSurface, surfaceId);
@@ -608,13 +615,13 @@
         }
 
 
-        get selectedSurfaceZ() {
+        get selectedSurfaceZPosition() {
             let defaultZ = parseFloat(this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--transform-local-z'));
             let  currentZ = this.$selectedSurface.computedStyleMap().get('transform')[2]['z']['value'];
             return currentZ / defaultZ;
         }
 
-        set selectedSurfaceZ(val) {
+        set selectedSurfaceZPosition(val) {
             if (val < -1 || val > 1) {
                 throw(new RangeError());
             }
@@ -624,6 +631,25 @@
             const subst = `translateZ(calc(var(--transform-local-z) * ${val}))`;
             const result = transform.replace(regex, subst);
             this.getStyleSheetRule(selector).style.setProperty('transform', result);
+        }
+
+
+        emphasizeSelectedSurface() {
+            this.getStyleSheetRule('.surface.surface').style.setProperty('transition', 'opacity 0.2s');
+            let toid = setTimeout( () => {
+                this.getStyleSheetRule('.surface.surface').style.removeProperty('transition');
+            }, 200);
+            this.getStyleSheetRule('.surface.surface').style.setProperty('opacity', '0.025');
+            this.$selectedSurface.style.opacity = '1';
+        }
+
+        deEmphasizeSelectedSurface() {
+            this.getStyleSheetRule('.surface.surface').style.setProperty('transition', 'opacity 0.2s');
+            let toid = setTimeout( () => {
+                this.getStyleSheetRule('.surface.surface').style.removeProperty('transition');
+            }, 200);
+            this.getStyleSheetRule('.surface.surface').style.removeProperty('opacity');
+            this.$selectedSurface.style.opacity = '';
         }
 
 
@@ -756,7 +782,7 @@
                         elm.$selectedSurface.style.transition = 'none';
                         console.log('input', this.value, val);
                     }
-                    elm['selectedSurfaceZ'] = this.value;
+                    elm['selectedSurfaceZPosition'] = this.value;
                     val = this.value;
                 }, {passive: true});
 
