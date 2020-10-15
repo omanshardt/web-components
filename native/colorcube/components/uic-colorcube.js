@@ -767,12 +767,10 @@
                 }, {passive: true});
                 element.addEventListener('touchstart', function (e) {
                     e.stopPropagation();
+
                     val = this.value;
-
-                    opacity = elm.getStyleSheetRule('.surface').style.getPropertyValue('opacity');
-                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', '0.025');
-
-                    elm.$selectedSurface.style.opacity = '1';
+                    elm.emphasizeSelectedSurface();
+                    toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
 
                     console.log('touchstart')
                 }, {passive: true});
@@ -790,10 +788,8 @@
                 }, {passive: true});
 
                 element.addEventListener('mouseup', function (e) {
-                    // elm.getStyleSheetRule('.surface').style.setProperty('opacity', opacity);
-
                     if (toid === null) {
-                            elm.deEmphasizeSelectedSurface();
+                        elm.deEmphasizeSelectedSurface();
                     }
                     toid = null;
 
@@ -801,10 +797,12 @@
                     console.log('mouseup')
                 }, {passive: true});
                 element.addEventListener('touchend', function (e) {
-                    elm.getStyleSheetRule('.surface').style.setProperty('opacity', opacity);
+                    if (toid === null) {
+                        elm.deEmphasizeSelectedSurface();
+                    }
+                    toid = null;
 
                     elm.$selectedSurface.style.transition = '';
-                    elm.$selectedSurface.style.opacity = '';
                     console.log('touchend')
                 }, {passive: true});
             }
