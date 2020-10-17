@@ -634,7 +634,6 @@
         }
 
         set selectedSurfaceZPosition(val) {
-            console.log('selectedSurfaceZPosition', val);
             if (val < -1 || val > 1) {
                 throw(new RangeError());
             }
@@ -676,6 +675,10 @@
          * @param e
          */
         startRotating = (e) => {
+            // prevent rotation start on other clicks than standard lef click
+            if (e.button !== undefined && e.button !== 0) {
+                return;
+            }
             e.preventDefault();
             e.stopPropagation();
             let pointerEventX = e.clientX || e.changedTouches[0].clientX;
@@ -797,14 +800,17 @@
 
                 element.addEventListener('input', function (e) {
                     if (Math.abs(this.value - val) < 0.05 && transition === null) {
+                        if (transition === null) {
+                            transition = true;
+                        }
                         elm.$selectedSurface.style.transition = 'none';
                         clearTimeout(toid);
                         toid = null;
                         console.log('input conti', this.value, val);
                     }
                     elm['selectedSurfaceZPosition'] = this.value;
-                    val = this.value;
                     console.log('input', this.value, val);
+                    val = this.value;
                 }, {passive: true});
 
                 element.addEventListener('mouseup', function (e) {
@@ -812,8 +818,10 @@
                         elm.deEmphasizeSelectedSurface();
                     }
                     toid = null;
-
-                    elm.$selectedSurface.style.transition = '';
+                    if (transition !== null) {
+                        elm.$selectedSurface.style.transition = '';
+                        transition = null;
+                    }
                     console.log('mouseup')
                 }, {passive: true});
                 element.addEventListener('touchend', function (e) {
@@ -840,12 +848,15 @@
                 }, {passive: true});
 
                 element.addEventListener('input', function (e) {
-                    if (Math.abs(this.value - val) < 0.05 && transition === null) {
-                        transition = elm.getStyleSheetRule(selector).style.getPropertyValue('transition');
+                    if (Math.abs(this.value - val) < 0.05) {
+                        if (transition === null) {
+                            transition = elm.getStyleSheetRule(selector).style.getPropertyValue('transition');
+                        }
                         elm.getStyleSheetRule(selector).style.removeProperty('transition');
-                        console.log('input', this.value, val);
+                        console.log('input conti', this.value, val);
                     }
                     elm[property] = this.value;
+                    console.log('input', this.value, val);
                     val = this.value;
                 }, {passive: true});
 
