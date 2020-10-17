@@ -264,7 +264,6 @@
                             $elm.selectedSurfaceZPosition = 1; // reset the currently selected surface
                             $elm.$selectedSurface = this; // set double-clicked surface as selected surface
                             let surfaceId = this.classList[1];
-                            console.log($elm.$selectedSurface, surfaceId);
                             $elm.surfaceSelectionCallback(this.$selectedSurface, surfaceId);
                         });
 
@@ -278,7 +277,6 @@
                                 $elm.selectedSurfaceZPosition = 1; // reset the currently selected surface
                                 $elm.$selectedSurface = this; // set double-clicked surface as selected surface
                                 let surfaceId = this.classList[1];
-                                console.log($elm.$selectedSurface, surfaceId);
                                 $elm.surfaceSelectionCallback(this.$selectedSurface, surfaceId);
                             }
                             else {
@@ -774,27 +772,29 @@
             let selector = null;
             if (property === 'moveSurface') {
                 selector = '.' + Array.from(elm.$selectedSurface.classList).join('.');
-                let opacity = null;
                 var toid = null;
-                // element.addEventListener('contextmenu', function(e) { console.log('cm'); e.preventDefault(); e.stopPropagation() } )
+                var noInput = false;
+                element.addEventListener('contextmenu', function(e) { if(e.button === 0) { e.preventDefault(); e.stopPropagation() } } )
                 // element.parentElement.addEventListener('touchstart', function (e) { console.log('yolo'); e.stopPropagation(); e.preventDefault();}, {passive: false});
-                element.addEventListener('mousedown', function (e) { // @Todo: keep emphasing as long as mouse is pressed
+                element.addEventListener('mousedown', function (e) { // @Todo: keep emphasizing as long as mouse is pressed
                     e.stopPropagation();
                     // e.preventDefault();
 
+                    if (toid) clearTimeout(toid);
                     val = this.value;
                     elm.emphasizeSelectedSurface();
-                    toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
+                    noInput = true;
 
                     console.log('mousedown');
                 }, {passive: false});
                 element.addEventListener('touchstart', function (e) {
                     e.stopPropagation();
 
+                    if (toid) clearTimeout(toid);
                     val = this.value;
                     elm.emphasizeSelectedSurface();
-                    toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
 
+                    noInput = true;
                     console.log('touchstart');
                 }, {passive: false});
 
@@ -806,36 +806,47 @@
                         elm.$selectedSurface.style.transition = 'none';
                         clearTimeout(toid);
                         toid = null;
-                        console.log('input conti', this.value, val);
+                        console.log('remove transition');
                     }
                     elm['selectedSurfaceZPosition'] = this.value;
-                    console.log('input', this.value, val);
                     val = this.value;
+                    noInput = false;
                 }, {passive: true});
 
                 element.addEventListener('mouseup', function (e) {
-                    if (toid === null) {
-                        elm.deEmphasizeSelectedSurface();
-                    }
                     toid = null;
-                    if (transition !== null) {
+                    if (transition !== null || noInput === true) {
+                        console.log('add transition immediadetly');
                         elm.$selectedSurface.style.transition = '';
                         transition = null;
+                        elm.deEmphasizeSelectedSurface()
                     }
+                    else {
+                        console.log('add transition delayed');
+                        toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
+                    }
+                    noInput = false;
                     console.log('mouseup')
                 }, {passive: true});
                 element.addEventListener('touchend', function (e) {
-                    if (toid === null) {
-                        elm.deEmphasizeSelectedSurface();
-                    }
                     toid = null;
-
-                    elm.$selectedSurface.style.transition = '';
+                    if (transition !== null || noInput === true) {
+                        console.log('add transition immediadetly');
+                        elm.$selectedSurface.style.transition = '';
+                        transition = null;
+                        elm.deEmphasizeSelectedSurface()
+                    }
+                    else {
+                        console.log('add transition delayed');
+                        toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
+                    }
+                    noInput = false;
                     console.log('touchend')
                 }, {passive: true});
             }
             else {
                 selector = (property === 'perspective') ? '.perspectiveWrapper' : '.surface';
+                element.addEventListener('contextmenu', function(e) { if(e.button === 0) { e.preventDefault(); e.stopPropagation() } } )
                 element.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
                     val = this.value;
@@ -850,9 +861,10 @@
                 element.addEventListener('input', function (e) {
                     if (Math.abs(this.value - val) < 0.05) {
                         if (transition === null) {
-                            transition = elm.getStyleSheetRule(selector).style.getPropertyValue('transition');
+                            transition = elm.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--generalTransitionTime');
+                            console.log('input conti', this.value, val, selector, transition);
                         }
-                        elm.getStyleSheetRule(selector).style.removeProperty('transition');
+                        elm.getStyleSheetRule('.cubeWrapper').style.removeProperty('--generalTransitionTime');
                         console.log('input conti', this.value, val);
                     }
                     elm[property] = this.value;
@@ -863,7 +875,8 @@
                 element.addEventListener('mouseup', function (e) {
                     // e.preventDefault();
                     if (transition !== null) {
-                        elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
+                        elm.getStyleSheetRule('.cubeWrapper').style.setProperty('--generalTransitionTime', transition);
+                        console.log('add transition', transition);
                         transition = null;
                     }
                     console.log('mouseup');
@@ -872,7 +885,8 @@
                 element.addEventListener('touchend', function (e) {
                     // e.preventDefault();
                     if (transition !== null) {
-                        elm.getStyleSheetRule(selector).style.setProperty('transition', transition);
+                        elm.getStyleSheetRule('.cubeWrapper').style.setProperty('--generalTransitionTime', transition);
+                        console.log('add transition', transition);
                         transition = null;
                     }
                     val = null;
