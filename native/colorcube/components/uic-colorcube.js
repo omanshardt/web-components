@@ -28,7 +28,6 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                transition: --front-zColor 0.75s;
                 /* -webkit-touch-callout: none !important; */
 
                 /*border:1px solid yellow;*/
@@ -105,7 +104,7 @@
                 border-style: solid;
                 border-color: #fff;
                 opacity: 1;
-                transition: opacity var(--opacityTransitionTime), border-radius var(--generalTransitionTime), transform var(--generalTransitionTime), width var(--generalTransitionTime), height var(--generalTransitionTime), border-width var(--generalTransitionTime);
+                transition: opacity var(--opacityTransitionTime), border-radius var(--generalTransitionTime), transform var(--generalTransitionTime), width var(--generalTransitionTime), height var(--generalTransitionTime), border-width var(--generalTransitionTime), background-color var(--generalTransitionTime);
             }
             
             .surface.surface {
@@ -114,38 +113,44 @@
 
             .surface.left {
                 transform: rotateX(0deg) rotateY(-90deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--left-zColor), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--left-zColor), var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 100%);
+                background-color:rgb(0, var(--left-zColor), 0);
+                background-image: linear-gradient(0deg, rgba(var(--red-min), 0, var(--blue-min), 1) 0%, rgba(var(--red-max), 0, var(--blue-min), 1) 100%),
+                linear-gradient(90deg, rgba(var(--red-min), 0, var(--blue-max), 1) 0%, rgba(var(--red-min), 0, var(--blue-min), 1) 100%);
             }
 
             .surface.front {
                 transform: rotateX(0deg) rotateY(0deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--front-zColor), 1) 0%, rgba(var(--red-max), var(--green-min), var(--front-zColor), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-max), var(--blue-min), 1) 100%);
+                background-color:rgb(0, 0, var(--front-zColor));
+                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), 0, 1) 0%, rgba(var(--red-max), var(--green-min), 0, 1) 100%),
+                linear-gradient(90deg, rgba(var(--red-min), var(--green-min), 0, 1) 0%, rgba(var(--red-min), var(--green-max), 0, 1) 100%);
             }
 
             .surface.right {
                 transform: rotateX(0deg) rotateY(90deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--right-zColor), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--right-zColor), var(--blue-max), 1) 100%);
+                background-color:rgb(0, var(--right-zColor), 0);
+                background-image: linear-gradient(0deg, rgba(var(--red-min), 0, var(--blue-min), 1) 0%, rgba(var(--red-max), 0, var(--blue-min), 1) 100%),
+                linear-gradient(90deg, rgba(var(--red-min), 0, var(--blue-min), 1) 0%, rgba(var(--red-min), 0, var(--blue-max), 1) 100%);
             }
 
             .surface.back {
                 transform: rotateX(0deg) rotateY(180deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-max), var(--green-min), var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-max), var(--back-zColor), 1) 0%, rgba(var(--red-min), var(--green-min), var(--back-zColor), 1) 100%);
+                background-color:rgb(0, 0, var(--back-zColor));
+                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), 0, 1) 0%, rgba(var(--red-max), var(--green-min), 0, 1) 100%),
+                linear-gradient(90deg, rgba(var(--red-min), var(--green-max), 0, 1) 0%, rgba(var(--red-min), var(--green-min), 0, 1) 100%);
             }
 
             .surface.top {
                 transform: rotateX(90deg) rotateY(0deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 100%),
-                linear-gradient(90deg, rgba(var(--top-zColor), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--top-zColor), var(--green-max), var(--blue-min), 1) 100%);
+                background-color:rgb(var(--top-zColor), 0, 0);
+                background-image: linear-gradient(0deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-min), var(--blue-max), 1) 100%),
+                linear-gradient(90deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-max), var(--blue-min), 1) 100%);
             }
 
             .surface.bottom {
                 transform: rotateX(-90deg) rotateY(0deg) translateZ(var(--transform-local-z));
-                background-image: linear-gradient(90deg, rgba(var(--bottom-zColor), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--bottom-zColor), var(--green-max), var(--blue-min), 1) 100%),
-                linear-gradient(180deg, rgba(var(--red-min), var(--green-min), var(--blue-min), 1) 0%, rgba(var(--red-min), var(--green-min), var(--blue-max), 1) 100%);
+                background-color:rgb(var(--bottom-zColor), 0, 0);
+                background-image: linear-gradient(90deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-max), var(--blue-min), 1) 100%),
+                linear-gradient(180deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-min), var(--blue-max), 1) 100%);
             }
 
             .surface > span {
@@ -705,7 +710,6 @@
 
             document.addEventListener('touchmove', _rotate, {passive: false});
             document.addEventListener('touchend', _stopRotating, {passive: false});
-            console.log('start');
         };
 
         /**
@@ -746,7 +750,6 @@
 
             document.removeEventListener('touchmove', rotateHandler, {passive: false});
             document.removeEventListener('touchend', stopRotatingHandler, {passive: false});
-            console.log('stop');
         };
 
 
@@ -779,13 +782,10 @@
                 element.addEventListener('mousedown', function (e) { // @Todo: keep emphasizing as long as mouse is pressed
                     e.stopPropagation();
                     // e.preventDefault();
-
                     if (toid) clearTimeout(toid);
                     val = this.value;
                     elm.emphasizeSelectedSurface();
                     noInput = true;
-
-                    console.log('mousedown');
                 }, {passive: false});
                 element.addEventListener('touchstart', function (e) {
                     e.stopPropagation();
@@ -795,7 +795,6 @@
                     elm.emphasizeSelectedSurface();
 
                     noInput = true;
-                    console.log('touchstart');
                 }, {passive: false});
 
                 element.addEventListener('input', function (e) {
@@ -806,7 +805,6 @@
                         elm.$selectedSurface.style.transition = 'none';
                         clearTimeout(toid);
                         toid = null;
-                        console.log('remove transition');
                     }
                     elm['selectedSurfaceZPosition'] = this.value;
                     val = this.value;
@@ -816,32 +814,26 @@
                 element.addEventListener('mouseup', function (e) {
                     toid = null;
                     if (transition !== null || noInput === true) {
-                        console.log('add transition immediadetly');
                         elm.$selectedSurface.style.transition = '';
                         transition = null;
                         elm.deEmphasizeSelectedSurface()
                     }
                     else {
-                        console.log('add transition delayed');
                         toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
                     }
                     noInput = false;
-                    console.log('mouseup')
                 }, {passive: true});
                 element.addEventListener('touchend', function (e) {
                     toid = null;
                     if (transition !== null || noInput === true) {
-                        console.log('add transition immediadetly');
                         elm.$selectedSurface.style.transition = '';
                         transition = null;
                         elm.deEmphasizeSelectedSurface()
                     }
                     else {
-                        console.log('add transition delayed');
                         toid = setTimeout( function() { elm.deEmphasizeSelectedSurface() }, 750);
                     }
                     noInput = false;
-                    console.log('touchend')
                 }, {passive: true});
             }
             else {
@@ -850,25 +842,20 @@
                 element.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
                     val = this.value;
-                    console.log('mousedown');
                 }, {passive: true});
                 element.addEventListener('touchstart', function (e) {
                     e.stopPropagation();
                     val = this.value;
-                    console.log('touchstart');
                 }, {passive: true});
 
                 element.addEventListener('input', function (e) {
                     if (Math.abs(this.value - val) < 0.05) {
                         if (transition === null) {
                             transition = elm.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--generalTransitionTime');
-                            console.log('input conti', this.value, val, selector, transition);
                         }
                         elm.getStyleSheetRule('.cubeWrapper').style.removeProperty('--generalTransitionTime');
-                        console.log('input conti', this.value, val);
                     }
                     elm[property] = this.value;
-                    console.log('input', this.value, val);
                     val = this.value;
                 }, {passive: true});
 
@@ -876,21 +863,17 @@
                     // e.preventDefault();
                     if (transition !== null) {
                         elm.getStyleSheetRule('.cubeWrapper').style.setProperty('--generalTransitionTime', transition);
-                        console.log('add transition', transition);
                         transition = null;
                     }
-                    console.log('mouseup');
                     val = null;
                 }, {passive: true});
                 element.addEventListener('touchend', function (e) {
                     // e.preventDefault();
                     if (transition !== null) {
                         elm.getStyleSheetRule('.cubeWrapper').style.setProperty('--generalTransitionTime', transition);
-                        console.log('add transition', transition);
                         transition = null;
                     }
                     val = null;
-                    console.log('touchend');
                 }, {passive: true});
                 // element.addEventListener('click', function(e) { e.preventDefault(); console.log('click') });
             }

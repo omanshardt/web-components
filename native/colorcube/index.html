@@ -113,9 +113,9 @@
         Move
         <input data-property="moveSurface" type="range" value="1" min="-1" max="1" step="0.01">
       </div>
-      <div>
+<!--      <div>
         <button data-property="selectSurface">Highlight</button> <button data-property="deSelectSurface">Lowlight</button>
-      </div>
+      </div> -->
     </div>
   </div>
 </div>
@@ -129,8 +129,8 @@
   colorCube.bind(document.querySelector('input[data-property="shrink"]'), 'shrink');
   colorCube.bind(document.querySelector('input[data-property="moveSurface"]'), 'moveSurface');
 
-  document.querySelector('button[data-property="selectSurface"]').addEventListener('click', function() { colorCube.emphasizeSelectedSurface(); console.log('show') } );
-  document.querySelector('button[data-property="deSelectSurface"]').addEventListener('click', function() { colorCube.deEmphasizeSelectedSurface(); console.log('show') } );
+  // document.querySelector('button[data-property="selectSurface"]').addEventListener('click', function() { colorCube.emphasizeSelectedSurface(); console.log('show') } );
+  // document.querySelector('button[data-property="deSelectSurface"]').addEventListener('click', function() { colorCube.deEmphasizeSelectedSurface(); console.log('show') } );
 
   colorCube.surfaceSelectionCallback = function(elm, id) {
     document.querySelector('#selectedSurface').innerHTML = id;
