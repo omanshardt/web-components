@@ -13,12 +13,14 @@
                 --blue-min: 0;
                 --blue-max: 255;
 
-                --front-zColor: calc(var(--blue-max) * 0);
-                --back-zColor: calc(var(--blue-max) * 1);
-                --left-zColor: calc(var(--green-max) * 0);
-                --right-zColor: calc(var(--green-max) * 1);
-                --bottom-zColor: calc(var(--red-max) * 0);
-                --top-zColor: calc(var(--red-max) * 1);
+                --front-zColor: calc(var(--blue-min) + (var(--blue-max) - var(--blue-min)) * 0);
+                --back-zColor: calc(var(--blue-min) + (var(--blue-max) - var(--blue-min)) * 1);
+
+                --left-zColor: calc(var(--green-min) + (var(--green-max) - var(--green-min)) * 0);
+                --right-zColor: calc(var(--green-min) + (var(--green-max) - var(--green-min)) * 1);
+
+                --bottom-zColor: calc(var(--red-min) + (var(--red-max) - var(--red-min)) * 0);
+                --top-zColor: calc(var(--red-min) + (var(--red-max) - var(--red-min)) * 1);
 
                 --transform-local-z: 128px;
                 --perspective: 1280px;
@@ -117,43 +119,49 @@
             .surface.left {
                 transform: rotateX(0deg) rotateY(-90deg) translateZ(var(--transform-local-z));
                 background-color:rgb(0, var(--left-zColor), 0);
-                background-image: linear-gradient(0deg, rgba(var(--red-min), 0, var(--blue-min), 1) 0%, rgba(var(--red-max), 0, var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), 0, var(--blue-max), 1) 0%, rgba(var(--red-min), 0, var(--blue-min), 1) 100%);
+                background-image:
+                linear-gradient(0deg,  rgba(var(--red-min), 0, 0, 1) 0%, rgba(var(--red-max), 0, 0, 1) 100%),
+                linear-gradient(90deg, rgba(0, 0, var(--blue-max), 1) 0%, rgba(0, 0, var(--blue-min), 1) 100%);
             }
 
             .surface.front {
                 transform: rotateX(0deg) rotateY(0deg) translateZ(var(--transform-local-z));
                 background-color:rgb(0, 0, var(--front-zColor));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), 0, 1) 0%, rgba(var(--red-max), var(--green-min), 0, 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-min), 0, 1) 0%, rgba(var(--red-min), var(--green-max), 0, 1) 100%);
+                background-image:
+                linear-gradient(0deg,  rgba(var(--red-min), 0, 0, 1) 0%, rgba(var(--red-max), 0, 0, 1) 100%),
+                linear-gradient(90deg, rgba(0, var(--green-min), 0, 1) 0%, rgba(0, var(--green-max), 0, 1) 100%);
             }
 
             .surface.right {
                 transform: rotateX(0deg) rotateY(90deg) translateZ(var(--transform-local-z));
                 background-color:rgb(0, var(--right-zColor), 0);
-                background-image: linear-gradient(0deg, rgba(var(--red-min), 0, var(--blue-min), 1) 0%, rgba(var(--red-max), 0, var(--blue-min), 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), 0, var(--blue-min), 1) 0%, rgba(var(--red-min), 0, var(--blue-max), 1) 100%);
+                background-image:
+                linear-gradient(0deg, rgba(var(--red-min), 0, 0, 1) 0%, rgba(var(--red-max), 0, 0, 1) 100%),
+                linear-gradient(90deg, rgba(0, 0, var(--blue-min), 1) 0%, rgba(0, 0, var(--blue-max), 1) 100%);
             }
 
             .surface.back {
                 transform: rotateX(0deg) rotateY(180deg) translateZ(var(--transform-local-z));
                 background-color:rgb(0, 0, var(--back-zColor));
-                background-image: linear-gradient(0deg, rgba(var(--red-min), var(--green-min), 0, 1) 0%, rgba(var(--red-max), var(--green-min), 0, 1) 100%),
-                linear-gradient(90deg, rgba(var(--red-min), var(--green-max), 0, 1) 0%, rgba(var(--red-min), var(--green-min), 0, 1) 100%);
+                background-image:
+                linear-gradient(0deg,  rgba(var(--red-min), 0, 0, 1) 0%, rgba(var(--red-max), 0, 0, 1) 100%),
+                linear-gradient(90deg, rgba(0, var(--green-max), 0, 1) 0%, rgba(0, var(--green-min), 0, 1) 100%);
             }
 
             .surface.top {
                 transform: rotateX(90deg) rotateY(0deg) translateZ(var(--transform-local-z));
                 background-color:rgb(var(--top-zColor), 0, 0);
-                background-image: linear-gradient(0deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-min), var(--blue-max), 1) 100%),
-                linear-gradient(90deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-max), var(--blue-min), 1) 100%);
+                background-image:
+                linear-gradient(0deg, rgba(0, 0, var(--blue-min), 1) 0%, rgba(0, 0, var(--blue-max), 1) 100%),
+                linear-gradient(90deg, rgba(0, var(--green-min), 0, 1) 0%, rgba(0, var(--green-max), 0, 1) 100%);
             }
 
             .surface.bottom {
                 transform: rotateX(-90deg) rotateY(0deg) translateZ(var(--transform-local-z));
                 background-color:rgb(var(--bottom-zColor), 0, 0);
-                background-image: linear-gradient(90deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-max), var(--blue-min), 1) 100%),
-                linear-gradient(180deg, rgba(0, var(--green-min), var(--blue-min), 1) 0%, rgba(0, var(--green-min), var(--blue-max), 1) 100%);
+                background-image:
+                linear-gradient(180deg, rgba(0, 0, var(--blue-min), 1) 0%, rgba(0, 0, var(--blue-max), 1) 100%),
+                linear-gradient(90deg, rgba(0, var(--green-min), 0, 1) 0%, rgba(0, var(--green-max), 0, 1) 100%)
             }
 
             .surface > span {
@@ -241,6 +249,24 @@
             }
             if (this.hasAttribute('border-radius')) {
                 this.borderRadius = this.getAttribute('border-radius');
+            }
+            if (this.hasAttribute('red-min')) {
+                this.redMin = this.getAttribute('red-min');
+            }
+            if (this.hasAttribute('red-max')) {
+                this.redMax = this.getAttribute('red-max');
+            }
+            if (this.hasAttribute('green-min')) {
+                this.greenMin = this.getAttribute('green-min');
+            }
+            if (this.hasAttribute('green-max')) {
+                this.greenMax = this.getAttribute('green-max');
+            }
+            if (this.hasAttribute('blue-min')) {
+                this.blueMin = this.getAttribute('blue-min');
+            }
+            if (this.hasAttribute('blue-max')) {
+                this.blueMax = this.getAttribute('blue-max');
             }
         }
 
@@ -375,11 +401,59 @@
                     this.getStyleSheetRule('.surface').style.setProperty('border-radius', `${val}%`);
                 } catch (e) {
                 }
+            } else if (attributeName === 'red-min') {
+                if (newValue < 0 || newValue > 255) {
+                    throw(new RangeError());
+                }
+                try {
+                    this.getStyleSheetRule('.cubeWrapper').style.setProperty('--red-min', `${newValue}`);
+                } catch (e) {
+                }
+            } else if (attributeName === 'red-max') {
+                if (newValue < 0 || newValue > 255) {
+                    throw(new RangeError());
+                }
+                try {
+                    this.getStyleSheetRule('.cubeWrapper').style.setProperty('--red-max', `${newValue}`);
+                } catch (e) {
+                }
+            } else if (attributeName === 'green-min') {
+                if (newValue < 0 || newValue > 255) {
+                    throw(new RangeError());
+                }
+                try {
+                    this.getStyleSheetRule('.cubeWrapper').style.setProperty('--green-min', `${newValue}`);
+                } catch (e) {
+                }
+            } else if (attributeName === 'green-max') {
+                if (newValue < 0 || newValue > 255) {
+                    throw(new RangeError());
+                }
+                try {
+                    this.getStyleSheetRule('.cubeWrapper').style.setProperty('--green-max', `${newValue}`);
+                } catch (e) {
+                }
+            } else if (attributeName === 'blue-min') {
+                if (newValue < 0 || newValue > 255) {
+                    throw(new RangeError());
+                }
+                try {
+                    this.getStyleSheetRule('.cubeWrapper').style.setProperty('--blue-min', `${newValue}`);
+                } catch (e) {
+                }
+            } else if (attributeName === 'blue-max') {
+                if (newValue < 0 || newValue > 255) {
+                    throw(new RangeError());
+                }
+                try {
+                    this.getStyleSheetRule('.cubeWrapper').style.setProperty('--blue-max', `${newValue}`);
+                } catch (e) {
+                }
             }
         }
 
         static get observedAttributes() {
-            return ['rotatable', 'rotation-x', 'rotation-y', 'opacity', 'shrink', 'explode', 'perspective', 'border-width', 'border-radius'];
+            return ['rotatable', 'rotation-x', 'rotation-y', 'opacity', 'shrink', 'explode', 'perspective', 'border-width', 'border-radius', 'red-min', 'red-max', 'green-min', 'green-max', 'blue-min', 'blue-max'];
         }
 
 
@@ -605,6 +679,144 @@
          *
          * @returns {*}
          */
+        get redMin() {
+            if (this.hasAttribute('red-min')) {
+                return this.getAttribute('red-min');
+            } else {
+                return this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('red-min');
+            }
+        }
+
+        /**
+         * @param val
+         */
+        set redMin(val) {
+            if (val < 0 || val > 255) {
+                throw(new RangeError());
+            }
+            this.setAttribute('red-min', val);
+        }
+
+
+        /**
+         *
+         * @returns {*}
+         */
+        get redMax() {
+            if (this.hasAttribute('red-max')) {
+                return this.getAttribute('red-max');
+            } else {
+                return this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--red-max');
+            }
+        }
+
+        /**
+         * @param val
+         */
+        set redMax(val) {
+            if (val < 0 || val > 255) {
+                throw(new RangeError());
+            }
+            this.setAttribute('red-max', val);
+        }
+
+
+        /**
+         *
+         * @returns {*}
+         */
+        get greenMin() {
+            if (this.hasAttribute('green-min')) {
+                return this.getAttribute('green-min');
+            } else {
+                return this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--green-min');
+            }
+        }
+
+        /**
+         * @param val
+         */
+        set greenMin(val) {
+            if (val < 0 || val > 255) {
+                throw(new RangeError());
+            }
+            this.setAttribute('green-min', val);
+        }
+
+
+        /**
+         *
+         * @returns {*}
+         */
+        get greenMax() {
+            if (this.hasAttribute('green-max')) {
+                return this.getAttribute('green-max');
+            } else {
+                return this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--green-max');
+            }
+        }
+
+        /**
+         * @param val
+         */
+        set greenMax(val) {
+            if (val < 0 || val > 255) {
+                throw(new RangeError());
+            }
+            this.setAttribute('green-max', val);
+        }
+
+
+        /**
+         *
+         * @returns {*}
+         */
+        get blueMin() {
+            if (this.hasAttribute('blue-min')) {
+                return this.getAttribute('blue-min');
+            } else {
+                return this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--blue-min');
+            }
+        }
+
+        /**
+         * @param val
+         */
+        set blueMin(val) {
+            if (val < 0 || val > 255) {
+                throw(new RangeError());
+            }
+            this.setAttribute('blue-min', val);
+        }
+
+
+        /**
+         *
+         * @returns {*}
+         */
+        get blueMax() {
+            if (this.hasAttribute('blue-max')) {
+                return this.getAttribute('blue-max');
+            } else {
+                return this.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--blue-max');
+            }
+        }
+
+        /**
+         * @param val
+         */
+        set blueMax(val) {
+            if (val < 0 || val > 255) {
+                throw(new RangeError());
+            }
+            this.setAttribute('blue-max', val);
+        }
+
+
+        /**
+         *
+         * @returns {*}
+         */
         get borderRadius() {
             if (this.hasAttribute('border-radius')) {
                 return this.getAttribute('border-radius');
@@ -653,7 +865,20 @@
             const subst = `translateZ(calc(var(--transform-local-z) * ${val}))`;
             const result = transform.replace(regex, subst);
             this.getStyleSheetRule(selector).style.setProperty('transform', result);
-            this.getStyleSheetRule ('.cubeWrapper').style.setProperty(propertyName, `calc(var(--blue-max) * ${colorVal})`);
+            switch(surface) {
+                case 'left':
+                case 'right':
+                    this.getStyleSheetRule ('.cubeWrapper').style.setProperty(propertyName, `calc(var(--green-min) + (var(--green-max) - var(--green-min)) * ${colorVal})`);
+                    break;
+                case 'front':
+                case 'back':
+                    this.getStyleSheetRule ('.cubeWrapper').style.setProperty(propertyName, `calc(var(--blue-min) + (var(--blue-max) - var(--blue-min)) * ${colorVal})`);
+                    break;
+                case 'top':
+                case 'bottom':
+                    this.getStyleSheetRule ('.cubeWrapper').style.setProperty(propertyName, `calc(var(--red-min) + (var(--red-max) - var(--red-min)) * ${colorVal})`);
+                    break;
+            }
         }
 
 
@@ -840,7 +1065,8 @@
                 }, {passive: true});
             }
             else {
-                selector = (property === 'perspective') ? '.perspectiveWrapper' : '.surface';
+                let deltaTime = (property === 'redMin' || property === 'redMax' || property === 'greenMin' || property === 'greenMax' || property === 'blueMin' || property === 'blueMax') ? 12.8 : 0.05;
+                // selector = (property === 'perspective') ? '.perspectiveWrapper' : '.surface';
                 element.addEventListener('contextmenu', function(e) { if(e.button === 0) { e.preventDefault(); e.stopPropagation() } } )
                 element.addEventListener('mousedown', function (e) {
                     e.stopPropagation();
@@ -852,7 +1078,7 @@
                 }, {passive: true});
 
                 element.addEventListener('input', function (e) {
-                    if (Math.abs(this.value - val) < 0.05) {
+                    if (Math.abs(this.value - val) < deltaTime) {
                         if (transition === null) {
                             transition = elm.getStyleSheetRule('.cubeWrapper').style.getPropertyValue('--generalTransitionTime');
                         }
