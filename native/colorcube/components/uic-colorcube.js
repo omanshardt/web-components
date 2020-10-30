@@ -1,3 +1,6 @@
+// Version 1.1
+// changed css of surfa ce labels now using mix-blend-mode
+
 (function () {
     const template = document.createElement('template');
     template.innerHTML = `
@@ -106,7 +109,7 @@
                 opacity: 1;
                 transition: opacity var(--opacityTransitionTime), border-radius var(--generalTransitionTime), transform var(--generalTransitionTime), width var(--generalTransitionTime), height var(--generalTransitionTime), border-width var(--generalTransitionTime), background-color var(--generalTransitionTime);
             }
-            
+
             .surface.surface {
             
             }
@@ -155,9 +158,10 @@
 
             .surface > span {
                 font-size: 32px;
-                color: #ffffff44;
-                text-shadow: -1px -1px 0px #00000011;
+                color: #00000033;
+                /* text-shadow: -1px -1px 0px #00000011; */
                 user-select: none;
+                mix-blend-mode:darken;
             }
 
         </style>
