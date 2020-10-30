@@ -64,6 +64,37 @@ Current Version: 1.1
 
 As this component uses some really new javascript API's and technologies, it is compatible only with the latest releases of all mainstream browsers. Please check it out on your target device and browser.
 
+**How to use the colorcube on your web page**
+
+- Import the uic-colorcube.js file into your page
+- use the `<uic-colorcube></uic-colorcube>` within your html.
+
+```
+<html>
+  <head>
+    <script src="components/uic-colorcube.js"></script>
+  </head>
+  <body>
+    <!-- with no attributes, default appearance and not rotatable -->
+    <uic-colorcube></uic-colorcube>
+
+    <!-- with custom attributes, custom appearance and rotatable -->
+    <uic-colorcube
+        rotatable
+        rotation-x="-15"
+        rotation-y="35"
+        opacity="0.5"
+        shrink="0"
+        explode="0"
+        perspective="0"
+        border-width="0.2"
+        border-radius="0"
+    ></uic-colorcube>
+  </body>
+</html>
+```
+
+The cube automatically adapts the size of the wrapping element.
 
 **History:**
 
