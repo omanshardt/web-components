@@ -1,5 +1,5 @@
-// Version 1.1
-// changed css of surfa ce labels now using mix-blend-mode
+// Version 1.1.1
+// Removed an excess div-element end tag
 
 (function () {
     const template = document.createElement('template');
@@ -182,7 +182,6 @@
                     </div>
                 </div>
             </div>
-        </div>
         </div>
     `;
 
