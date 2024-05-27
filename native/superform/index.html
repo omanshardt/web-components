@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>superForm</title>
+    <script src="components/super-form.js"></script>
+</head>
+<body>
+    <form id="myform" is="super-form">
+        <select name="gender">
+            <option>Männlich</option>
+            <option>Weiblich</option>
+            <option>Divers</option>
+        </select><br>
+        <input type="range" name="salary" placeholder="salary" min="10" max="40"><br>
+        <input type="text" name="firstname" placeholder="Your firstname"><br>
+        <input type="text" name="lastname" placeholder="Your lastname"><br>
+        <input type="text" name="username" placeholder="Your username"><br>
+        <input type="color" name="color" placeholder="Your color"><br>
+        <button tyle="submit">Senden</button><br>
+    </form>
+    <button id="addElement">Add element</button>
+    <button id="removeElement">Remove element</button>
+<script>
+    let mySF = document.querySelector('#myform');
+
+    mySF.addEventListener('sf-submit', function(e) {
+        console.log('sf-submit', e);
+        let mySelect = document.querySelector('select[name="gender"]')
+        let myRange = document.querySelector('input[name="salary"]')
+        let myColor = document.querySelector('input[name="color"]')
+    //    mySelect.selectedIndex = -1;
+//         console.log('mySelect.selectedIndex', mySelect.selectedIndex);
+//         console.log('mySelect.options[0].defaultSelected', mySelect.options[0].defaultSelected);
+//         console.log('mySelect.options[0].defaultSelected', mySelect.options[0].selected);
+// 
+//         console.log('myRange.defaultValue', myRange.defaultValue);
+//         console.log('myRange.value', myRange.value);
+// 
+//         console.log('myColor.defaultValue', myColor.defaultValue);
+//         console.log('myColor.value', myColor.value);
+    });
+
+
+    document.querySelector('#addElement').addEventListener('click', function() {
+        mySF.insertAdjacentHTML('beforeend', '<input type="text" name="country" /><br>');
+    });
+    document.querySelector('#removeElement').addEventListener('click', function() {
+        document.querySelector('input[name="country"]').remove();
+    });
+</script>
+</body>
+</html>
