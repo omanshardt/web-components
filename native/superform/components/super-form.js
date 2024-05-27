@@ -9,9 +9,12 @@ class SuperForm extends HTMLFormElement {
         console.log('construct')
     }
 
+    // public methods
+
     connectedCallback() {
-        this.init();
-        this.registerCallbacks();
+        SuperForm.instances.push(this);
+        this.#init();
+        this.#registerEventListeners();
     }
 
     disconnectedCallback() {
@@ -26,7 +29,15 @@ class SuperForm extends HTMLFormElement {
         console.log(`Attribute ${name} has changed.`);
     }
 
-    init() {
+    aaa() { console.log('Public instant method') };
+
+    // private methods
+ 
+    // Only the listed properties should accepted as default values
+    // I put this in the instance scope so that this could be declared as private
+    // probably not a good idea because when we lazy load a SuperForm it cannnot 
+
+    #init() {
         // Get the form
         let mySF = this;
         let observer = new MutationObserver(function(mutations) {
@@ -62,52 +73,59 @@ class SuperForm extends HTMLFormElement {
 
             observer.disconnect();
         });
-        this.addEventListener('submit', function(e) {
-            e.preventDefault();
-            console.log('submit', e);
-
-
-
-            let sfsubmit = new SubmitEvent("sf-submit", {
-                bubbles: true,
-                cancelable: true,
-                composed: false,
-                submitter: e.submitter
-//                 detail: {
-//                     originalEvent: e
-//                 },
-            });
-            mySF.dispatchEvent(sfsubmit)
-        });
         // We only get aware of the elements within the form if we observe their insertion,
         // at the time when 'mutation.addedNodes.length' is executed there are no elements within our custom element
         observer.observe(this, { childList: true })
     }
 
-    registerCallbacks() {
+    #registerDefaults(def) {
+        for(let i in def) {
+            if (this.#internalDefaults.includes(i)) {
+               console.log('ja');
+               this.#addEventListener(def[i]);
+            }
+            else {
+               // @TODO: error log ;
+            }
+        }
+    }
+
+    #registerEventListeners() {
         // Get the form
         let mySF = this;
         this.addEventListener('submit', function(e) {
             e.preventDefault();
-            console.log('submit', e);
-
-
-
-            let sfsubmit = new SubmitEvent("sf-submit", {
+            let sfsubmit = new CustomEvent('sf-submit', {
                 bubbles: true,
                 cancelable: true,
                 composed: false,
-                submitter: e.submitter
-//                 detail: {
-//                     originalEvent: e
-//                 },
+                detail: {
+                    originalEvent: e,
+                    seriaizedData: 'serializedData',
+                    data: 'data',
+                    modifiedData: 'modifiedData'
+                }
             });
-            mySF.dispatchEvent(sfsubmit)
+            mySF.dispatchEvent(sfsubmit);
         });
-        // We only get aware of the elements within the form if we observe their insertion,
-        // at the time when 'mutation.addedNodes.length' is executed there are no elements within our custom element
-        observer.observe(this, { childList: true })
     }
+
+    #addEventListener(fnc) {
+        this.addEventListener('sf-submit', fnc);
+    }
+
+    // static methods
+
+    // holds all instances of super-forms
+    static instances = [];
+    // static internalDefaults = ['onFormInit', 'onFormSubmit', 'onInitDataLoad', 'onInitDataUnload', 'onDataLoad', 'onDataUnload', 'onPropertyInitValChange', 'onPropertyValChange', 'onPropertyModifiedStateChange', 'onPropertyValidStateChange', 'onFormModifiedStateChange', 'onFormValidStateChange', 'onResetFields', 'onClear', 'onWipe', 'dataTransformer'];
+    // static defaults = {};
+
+    static registerDefaults(def) {
+        for(let i in SuperForm.instances) {
+            SuperForm.instances[i].#registerDefaults(def);
+        }
+    };
 }
 
 customElements.define("super-form", SuperForm, { extends: "form" });
