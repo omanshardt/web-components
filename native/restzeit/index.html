@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    <title>RestZeit</title>
+    <style>
+        html {
+            height:100%;
+        }
+        body {
+            margin:0;
+            height:100%;
+            background:#223344ff;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#cccccc;
+        }
+        @media (orientation: landscape) {
+          rest-zeit {
+            font-size: 6vw;
+          }
+        }
+        @media (orientation: portrait) {
+          rest-zeit {
+            font-size: 6vw;
+          }
+        }
+    </style>
+</head>
+<body>
+    <rest-zeit
+        lunch="13"
+        afternoon="15"
+        evening="24"
+        lunch-text="Bis zum Mittag: "
+        afternoon-text="Bis zur Kaffe-Pause:"
+        evening-text="Bis Feierabend:"
+        >
+    </rest-zeit>
+    <script src="components/restzeit/rest-zeit.js"></script>
+</body>
+</html>
